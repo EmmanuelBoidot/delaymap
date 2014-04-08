@@ -177,16 +177,27 @@ window.onresize = resize_bar_chart;
 // 		.attr("stroke", "#FFFFFF")
 // 		.attr("stroke-width", 0.5);
 // });
-var merged_data = []
+var merged_data = [];
 
-d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
-	// console.log(data)
+// d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
+d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", function (error, data) {
+	// console.log(data.data)
 	historical_data.push(data);
 	current_time = new Date(data.time * 1000);
 	// console.log(current_time)
 
 	join_airports_to_data(data.data);
+	console.log(data.data);
 	merged_data = merge_data(data.data);
+	console.log(merged_data);
+	var test = merged_data.map(function(d) {
+		console.log(merged_data[merged_data.indexOf(d)]);
+	    return {
+	        airport:d[1],
+	    };
+	});
+	merged_data = test;
+	console.log(merged_data)
 	// var mydata = []
 	// for(var i = 0; i < merged_data.length; i++){
 	// 	console.log(merged_data[i].airport)
@@ -209,10 +220,11 @@ d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 	// my_airports = my_airports.data(merged_data, key);
 	// console.log(my_airports)
 	var pies = map.select("g#pies").selectAll("g")
-		.data(merged_data,function( d) {return merged_data.indexOf( d);})
+		.data(merged_data,key)
 		.enter().append("g")
 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
 		.attr("class", "pie");
+	console.log(map.select("g#pies").selectAll("g").datum());
 
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
@@ -236,7 +248,7 @@ d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 		.style("fill", "transparent");
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,function( d) {return merged_data.indexOf( d);})
+		.data(merged_data,key)
 		.enter().append("circle")
 		.attr("r", 0)
 		.attr("cx", function(d) { return projection(d.coordinates)[0]; })
@@ -246,7 +258,8 @@ d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 	redraw(data.data, current_time, merged_data);
 
 	// TODO : We should be doing the two ajax calls parallel, but we need a way to guarantee the first one finished before the second one
-	d3.json("./FlightAwareMiseryMap_files/historical.rvt", function (error, data) {
+	// d3.json("./FlightAwareMiseryMap_files/historical.rvt", function (error, data) {
+	d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt", function (error, data) {
 		// historical_data = []
 		historical_data = historical_data.concat(data);
 		// current_time = new Date(data.time * 1000);
@@ -355,6 +368,7 @@ d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 
 
 function key(d) {
+	console.log(d)
 	return d.airport;
 }
 
@@ -461,7 +475,7 @@ function redraw(data, time, merged_data) {
 		.attr("y2", height);
 
 	var bars = chart.select("g#chart-content").selectAll("g.chart-bar")
-		.data(filtered_data,function( d) {return filtered_data.indexOf( d);});
+		.data(filtered_data,key);
 	// console.log(bars)
 
 	bars
@@ -555,11 +569,8 @@ function redraw(data, time, merged_data) {
 	// console.log(merged_data[0].airport)
 	var pies = map.select("g#pies").selectAll("g")
 		// .data(merged_data,key);
-		.data(merged_data,function( d) {return merged_data.indexOf( d);})
-		.enter().append("g")
-		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
-		.attr("class", "pie");
-	console.log(pies)
+		.data(merged_data,key)
+	console.log(map.select("g#pies").selectAll("g"))
 
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
@@ -663,7 +674,7 @@ function redraw(data, time, merged_data) {
 		});
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,function( d) {return merged_data.indexOf( d);})
+		.data(merged_data,key)
 		.transition()
 		.attr("r", function(d) { return outer_radius({data: d}) + 2; });
 
@@ -708,7 +719,7 @@ function drawTracks(element, data) {
 	var animate_tracks = map.select("g#tracks").selectAll("path")[0].length < 1;
 
 	var tracks = map.select("g#tracks").selectAll("path")
-		.data(data, function( d) {return merged_data.indexOf( d);});
+		.data(data, key);
 
 	tracks
 		.enter().append("path")
@@ -1131,9 +1142,7 @@ function flight_finder_option_change(orig) {
 
 function resize_bar_chart() {
 	var dy = parseInt(d3.select("svg#timeline").style("height"), 10) - 44 + // Approx. height of button
-		     parseInt(d3.select("#ad-content").style("height"), 10) +
-			 parseInt(d3.select("#topbar").style("height"), 10) +
-			 87; // Height of delay/cancellation count text.
+		     87; // Height of delay/cancellation count text.
 
 	d3.select("#chart-container").style("height", (window.innerHeight - dy).toString() + 'px');
 

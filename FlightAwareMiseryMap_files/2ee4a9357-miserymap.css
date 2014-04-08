@@ -83,7 +83,7 @@ main {
 	right: 0;
 	bottom: 0;
 	padding-right: 10px;
-	margin: 45px 25% 5% 0; /* Since margins are relative to the width,
+	margin: 0px 25% 15% 0; /* Since margins are relative to the width,
 	top margin is a guestimate */
 }
 aside {
@@ -312,7 +312,7 @@ g#tracks {
 }
 #sibebar-fullcancellink {
 	/*color: #002F5D;*/
-	font-size: 12px;
+	font-size: 36px;
 	font-size: 1.2vmin;
 	text-align: center;
 	margin-bottom: 15px;

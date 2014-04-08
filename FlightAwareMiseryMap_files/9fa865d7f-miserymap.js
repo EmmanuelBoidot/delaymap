@@ -203,22 +203,25 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 	join_airports_to_data(data.data);
 	// console.log(data.data);
 	merged_data = merge_data(data.data);
+	// console.log("MAIN:\t merged_data");
 	// console.log(merged_data);
-	var mymergeddata = []
-	for(var i = 0; i < merged_data.length; i++){
-		// console.log(merged_data[i].airport)
-	    var item = {airport: 			merged_data[i].airport, 
-			    	cancelled: 			merged_data[i].cancelled,
-			    	coordinates: 		merged_data[i].coordinates,
-					delayed: 			merged_data[i].delayed,
-					destinations: 		merged_data[i].destinations,
-					iata: 				merged_data[i].iata,
-					name: 				merged_data[i].name,
-					ontime: 			merged_data[i].ontime};
-	    mymergeddata.push(item);
-	}
-	data = {time:data.time, data:mymergeddata};
-	console.log(mymergeddata)
+	// var mymergeddata = []
+	// for(var i = 0; i < merged_data.length; i++){
+	// 	// console.log(merged_data[i].airport)
+	//     var item = {airport: 			merged_data[i].airport, 
+	// 		    	cancelled: 			merged_data[i].cancelled,
+	// 		    	coordinates: 		merged_data[i].coordinates,
+	// 				delayed: 			merged_data[i].delayed,
+	// 				destinations: 		merged_data[i].destinations,
+	// 				iata: 				merged_data[i].iata,
+	// 				name: 				merged_data[i].name,
+	// 				ontime: 			merged_data[i].ontime,
+	// 				terminal_area: 		merged_data[i].terminal_area};
+	//     mymergeddata.push(item);
+	// }
+	// merged_data = mymergeddata;
+	// console.log("MAIN:\t mymergeddata");
+	// console.log(mymergeddata);
 
 	// Draw pie charts
 	// console.log(merged_data)
@@ -450,25 +453,26 @@ function redraw(data, time, merged_data) {
 	if (typeof merged_data === "undefined") {
 		join_airports_to_data(data);
 		var merged_data = merge_data(data);
-		var mymergeddata = []
-		for(var i = 0; i < merged_data.length; i++){
-			// console.log(merged_data[i].airport)
-		    var item = {airport: 			merged_data[i].airport, 
-				    	cancelled: 			merged_data[i].cancelled,
-				    	coordinates: 		merged_data[i].coordinates,
-						delayed: 			merged_data[i].delayed,
-						destinations: 		merged_data[i].destinations,
-						iata: 				merged_data[i].iata,
-						name: 				merged_data[i].name,
-						ontime: 			merged_data[i].ontime};
-		    mymergeddata.push(item);
-		}
-		merged_data = mymergeddata;
+		// var mymergeddata = []
+		// for(var i = 0; i < merged_data.length; i++){
+		// 	// console.log(merged_data[i].airport)
+		//     var item = {airport: 			merged_data[i].airport, 
+		// 		    	cancelled: 			merged_data[i].cancelled,
+		// 		    	coordinates: 		merged_data[i].coordinates,
+		// 				delayed: 			merged_data[i].delayed,
+		// 				destinations: 		merged_data[i].destinations,
+		// 				iata: 				merged_data[i].iata,
+		// 				name: 				merged_data[i].name,
+		// 				ontime: 			merged_data[i].ontime,
+		// 				terminal_area: 		merged_data[i].terminal_area};
+		//     mymergeddata.push(item);
+		// }
+		// merged_data = mymergeddata;
 	}
 	// console.log(data);
+	console.log("REDRAW:\t merged_data")
 	console.log(merged_data);
 	// data = merged_data;
-	// console.log(mydata)
 
 	d3.selectAll("#count-delays-value, #count-cancellations-value")
 		.data(data.reduce(function(a, b) { return [a[0] + b.delayed, a[1] + b.cancelled]; }, [0, 0]))
@@ -497,9 +501,9 @@ function redraw(data, time, merged_data) {
 	var airport_sort = function(a,b) { return d3.descending(a.delayed + a.cancelled, b.delayed + b.cancelled); };
 	// Limit result to top 16
 	// var filtered_data = data.filter(function(d) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort).slice(0, 20);
-	var filtered_data = data.filter(function(d) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort);
+	var filtered_data = data.filter(function(d,i) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort);
 	// console.log(data);
-	// console.log(filtered_data);
+	console.log(filtered_data);
 	// console.log(filtered_data[0].airport)
 
 	var height = filtered_data.length * 20;
@@ -510,7 +514,7 @@ function redraw(data, time, merged_data) {
 
 	var x = d3.scale.linear()
 		// Round up the max to the nearest multiple of 10
-		.domain([0, Math.ceil(d3.max(filtered_data, function(d) { return d.delayed + d.cancelled; }) / 10) * 10])
+		.domain([0, Math.ceil(d3.max(filtered_data, function(d,i) { return d.delayed + d.cancelled; }) / 10) * 10])
 		.range([0, 270]);
 
 	var y = d3.scale.ordinal()
@@ -525,6 +529,7 @@ function redraw(data, time, merged_data) {
 		.data(filtered_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})//,function(d){if (typeof filtered_data[filtered_data.indexOf(d)] !== 'undefined'){
 			// console.log(filtered_data[filtered_data.indexOf(d)]);
 			// return filtered_data[filtered_data.indexOf(d)];}})
+	console.log("REDRAW:\t bars");
 	console.log(bars)
 
 	bars
@@ -623,25 +628,6 @@ function redraw(data, time, merged_data) {
 			return d.aircraft;}})
 		// .enter()
 	// console.log(map.select("g#pies").selectAll("g"))
-
-	pies.selectAll("path")
-		.data(function(d, i) { return pie([d, d], i); })
-		.style("stroke", "white")
-		.style("fill", function(d, i) { return (i == 0 ? colors.ontime : colors.delayed); })
-		.transition()
-		.attrTween("d", arcTween);
-
-	pies.selectAll("text")
-		.data(function(d) { return [d]; })
-		.transition()
-		// Only show label if there's enough space
-		.attr("display", function(d) { if (inner_radius({data: d}) <= 9) return "none"; });
-
-	pies.selectAll("circle")
-		.data(function(d) { return [d]; })
-		.transition()
-		.attr("r", function(d) { return outer_radius({data: d}); });
-
 	pies
 		.on("mouseenter", function(d) {
 			highlightAirport(d3.select(this), merged_data);
@@ -725,10 +711,32 @@ function redraw(data, time, merged_data) {
 			}
 		});
 
+	var plop = pies.selectAll("path")
+		.data(function(d, i) { return pie([d, d], i); });
+	console.log(plop)
+	plop = plop.style("stroke", "white")
+		.style("fill", function(d, i) { return (i == 0 ? colors.ontime : colors.delayed); })
+		.transition()
+	console.log(plop)
+	plop
+		.attrTween("d", arcTween);
+
+	pies.selectAll("text")
+		.data(function(d) { return [d]; })
+		.transition()
+		// Only show label if there's enough space
+		.attr("display", function(d) { if (inner_radius({data: d}) <= 9) return "none"; });
+
+	pies.selectAll("circle")
+		.data(function(d) { return [d]; })
+		.transition()
+		.attr("r", function(d) { return outer_radius({data: d}); });
+
+
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){
 			// console.log(filtered_data[filtered_data.indexOf(d)]);
-			return merged_data[merged_data.indexOf(d)];}})
+			return d.airport;}})
 		.transition()
 		.attr("r", function(d) { return outer_radius({data: d}) + 2; });
 
@@ -1024,7 +1032,7 @@ function join_airports_to_data(data) {
 
 function get_pie_from_bar(d) {
 	// console.log(map.selectAll("g#pies > g"))
-	return map.selectAll("g#pies > g").filter(function(e) { return e.airport.indexOf(d.airport) !== -1; });
+	return map.selectAll("g#pies > g").filter(function(e,i) { return e.airport.indexOf(d.airport) !== -1; });
 }
 
 function get_weather_url_at_time(time) {

@@ -212,12 +212,14 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 	// my_airports = my_airports.data(merged_data, key);
 	// console.log(my_airports)
 	var pies = map.select("g#pies").selectAll("g")
-		// .data(merged_data,function(d){console.log(merged_data[merged_data.indexOf(d)]);return merged_data[merged_data.indexOf(d)].airport;})
-		.data(merged_data,key)
+		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+			console.log(merged_data[merged_data.indexOf(d)]);
+			return merged_data[merged_data.indexOf(d)];}})
+		// .data(merged_data,key)
 		.enter().append("g")
 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
 		.attr("class", "pie");
-	console.log(map.select("g#pies").selectAll("g").datum());
+	// console.log(map.select("g#pies").selectAll("g").datum());
 
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
@@ -241,7 +243,9 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 		.style("fill", "transparent");
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,key)
+		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+			console.log(merged_data[merged_data.indexOf(d)]);
+			return merged_data[merged_data.indexOf(d)];}})
 		.enter().append("circle")
 		.attr("r", 0)
 		.attr("cx", function(d) { return projection(d.coordinates)[0]; })
@@ -361,7 +365,7 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 
 
 function key(d) {
-	console.log(d)
+	// console.log(d)
 	return d.airport;
 }
 
@@ -468,7 +472,9 @@ function redraw(data, time, merged_data) {
 		.attr("y2", height);
 
 	var bars = chart.select("g#chart-content").selectAll("g.chart-bar")
-		.data(filtered_data,key);
+		.data(filtered_data,function(d){if (typeof filtered_data[filtered_data.indexOf(d)] !== 'undefined'){
+			// console.log(filtered_data[filtered_data.indexOf(d)]);
+			return filtered_data[filtered_data.indexOf(d)];}})
 	// console.log(bars)
 
 	bars
@@ -562,7 +568,9 @@ function redraw(data, time, merged_data) {
 	// console.log(merged_data[0].airport)
 	var pies = map.select("g#pies").selectAll("g")
 		// .data(merged_data,key);
-		.data(merged_data,key)
+		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+			// console.log(filtered_data[filtered_data.indexOf(d)]);
+			return merged_data[merged_data.indexOf(d)];}})
 	console.log(map.select("g#pies").selectAll("g"))
 
 	pies.selectAll("path")
@@ -667,7 +675,9 @@ function redraw(data, time, merged_data) {
 		});
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,key)
+		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+			// console.log(filtered_data[filtered_data.indexOf(d)]);
+			return merged_data[merged_data.indexOf(d)];}})
 		.transition()
 		.attr("r", function(d) { return outer_radius({data: d}) + 2; });
 
@@ -1011,13 +1021,13 @@ function merge_data(data) {
 			result.push(merged_airport);
 		}
 	}
-	var test = result.map(function(d) {
-		console.log(result[result.indexOf(d)]);
-	    return {
-	        airport: result[result.indexOf(d)].airport,
-	    };
-	});
-	result = test;
+	// var test = result.map(function(d) {
+	// 	console.log(result[result.indexOf(d)]);
+	//     return {
+	//         airport: result[result.indexOf(d)],
+	//     };
+	// });
+	// result = test;
 
 	return result;
 }

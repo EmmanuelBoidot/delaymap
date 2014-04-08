@@ -190,14 +190,6 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 	console.log(data.data);
 	merged_data = merge_data(data.data);
 	console.log(merged_data);
-	var test = merged_data.map(function(d) {
-		console.log(merged_data[merged_data.indexOf(d)]);
-	    return {
-	        airport:d[1],
-	    };
-	});
-	merged_data = test;
-	console.log(merged_data)
 	// var mydata = []
 	// for(var i = 0; i < merged_data.length; i++){
 	// 	console.log(merged_data[i].airport)
@@ -220,6 +212,7 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 	// my_airports = my_airports.data(merged_data, key);
 	// console.log(my_airports)
 	var pies = map.select("g#pies").selectAll("g")
+		// .data(merged_data,function(d){console.log(merged_data[merged_data.indexOf(d)]);return merged_data[merged_data.indexOf(d)].airport;})
 		.data(merged_data,key)
 		.enter().append("g")
 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
@@ -1018,6 +1011,13 @@ function merge_data(data) {
 			result.push(merged_airport);
 		}
 	}
+	var test = result.map(function(d) {
+		console.log(result[result.indexOf(d)]);
+	    return {
+	        airport: result[result.indexOf(d)].airport,
+	    };
+	});
+	result = test;
 
 	return result;
 }

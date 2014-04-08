@@ -177,33 +177,48 @@ window.onresize = resize_bar_chart;
 // 		.attr("stroke", "#FFFFFF")
 // 		.attr("stroke-width", 0.5);
 // });
-var merged_data = [];
+// var mydata = []
 
 // d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", function (error, data) {
-	// console.log(data.data)
+	var mydata = []
+	for(var i = 0; i < data.data.length; i++){
+		// console.log(data.data[i].airport)
+	    var item = {airport: 			data.data[i].airport, 
+			    	cancelled: 			data.data[i].cancelled,
+			    	coordinates: 		data.data[i].coordinates,
+					delayed: 			data.data[i].delayed,
+					destinations: 		data.data[i].destinations,
+					iata: 				data.data[i].iata,
+					name: 				data.data[i].name,
+					ontime: 			data.data[i].ontime};
+	    mydata.push(item);
+	}	
+	data = {time:data.time, data:mydata};
 	historical_data.push(data);
 	current_time = new Date(data.time * 1000);
+	console.log(historical_data)
 	// console.log(current_time)
 
 	join_airports_to_data(data.data);
-	console.log(data.data);
+	// console.log(data.data);
 	merged_data = merge_data(data.data);
-	console.log(merged_data);
-	// var mydata = []
-	// for(var i = 0; i < merged_data.length; i++){
-	// 	console.log(merged_data[i].airport)
-	//     var item = {airport: 			merged_data[i].airport, 
-	// 		    	cancelled: 			merged_data[i].cancelled,
-	// 		    	coordinates: 		merged_data[i].coordinates,
-	// 				delayed: 			merged_data[i].delayed,
-	// 				destinations: 		merged_data[i].destinations,
-	// 				iata: 				merged_data[i].iata,
-	// 				name: 				merged_data[i].name,
-	// 				ontime: 			merged_data[i].ontime};
-	//     mydata.push(item);
-	// }
-	// console.log(mydata)
+	// console.log(merged_data);
+	var mymergeddata = []
+	for(var i = 0; i < merged_data.length; i++){
+		// console.log(merged_data[i].airport)
+	    var item = {airport: 			merged_data[i].airport, 
+			    	cancelled: 			merged_data[i].cancelled,
+			    	coordinates: 		merged_data[i].coordinates,
+					delayed: 			merged_data[i].delayed,
+					destinations: 		merged_data[i].destinations,
+					iata: 				merged_data[i].iata,
+					name: 				merged_data[i].name,
+					ontime: 			merged_data[i].ontime};
+	    mymergeddata.push(item);
+	}
+	data = {time:data.time, data:mymergeddata};
+	console.log(mymergeddata)
 
 	// Draw pie charts
 	// console.log(merged_data)
@@ -212,19 +227,20 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 	// my_airports = my_airports.data(merged_data, key);
 	// console.log(my_airports)
 	var pies = map.select("g#pies").selectAll("g")
-		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+		.data(mydata,function(d, i){if (typeof d !== 'undefined'){
 			// console.log(merged_data[merged_data.indexOf(d)]);
-			return merged_data[merged_data.indexOf(d)];}})
+			return d.airport;}})
 		// .data(merged_data,key)
 		.enter().append("g")
 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
 		.attr("class", "pie");
-	// console.log(map.select("g#pies").selectAll("g").datum());
+	console.log(pies);
 
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
 		.enter().append("path")
 		.each(function(d) { this._current = d; }); // store the initial values for animation tweening
+	console.log(pies.selectAll("path"));
 
 	pies.selectAll("text")
 		.data(function(d) { return [d]; })
@@ -243,9 +259,9 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 		.style("fill", "transparent");
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+		.data(mydata,function(d, i){if (typeof d !== 'undefined'){
 			// console.log(merged_data[merged_data.indexOf(d)]);
-			return merged_data[merged_data.indexOf(d)];}})
+			return d.airport;}})
 		.enter().append("circle")
 		.attr("r", 0)
 		.attr("cx", function(d) { return projection(d.coordinates)[0]; })
@@ -257,8 +273,27 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 	// TODO : We should be doing the two ajax calls parallel, but we need a way to guarantee the first one finished before the second one
 	// d3.json("./FlightAwareMiseryMap_files/historical.rvt", function (error, data) {
 	d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt", function (error, data) {
-		// historical_data = []
+		console.log(data);
+		var mydata = []
+		for(var i = 0; i < data.length; i++){
+			// console.log(merged_data[i].airport)
+			item_data = []
+			for (var j = 0; j < data[i].data.length; j++){
+			    var item = {airport: 			data[i].data[j].airport, 
+					    	cancelled: 			data[i].data[j].cancelled,
+					    	coordinates: 		data[i].data[j].coordinates,
+							delayed: 			data[i].data[j].delayed,
+							destinations: 		data[i].data[j].destinations,
+							iata: 				data[i].data[j].iata,
+							name: 				data[i].data[j].name,
+							ontime: 			data[i].data[j].ontime};
+			    item_data.push(item);
+			}
+			mydata.push({time:data[i].time, data:item_data})
+		}
+		data = mydata;
 		historical_data = historical_data.concat(data);
+		console.log(historical_data);
 		// current_time = new Date(data.time * 1000);
 		var data = [[], []];
 
@@ -415,10 +450,25 @@ function redraw(data, time, merged_data) {
 	if (typeof merged_data === "undefined") {
 		join_airports_to_data(data);
 		var merged_data = merge_data(data);
+		var mymergeddata = []
+		for(var i = 0; i < merged_data.length; i++){
+			// console.log(merged_data[i].airport)
+		    var item = {airport: 			merged_data[i].airport, 
+				    	cancelled: 			merged_data[i].cancelled,
+				    	coordinates: 		merged_data[i].coordinates,
+						delayed: 			merged_data[i].delayed,
+						destinations: 		merged_data[i].destinations,
+						iata: 				merged_data[i].iata,
+						name: 				merged_data[i].name,
+						ontime: 			merged_data[i].ontime};
+		    mymergeddata.push(item);
+		}
+		merged_data = mymergeddata;
 	}
-	console.log(data);
+	// console.log(data);
 	console.log(merged_data);
 	// data = merged_data;
+	// console.log(mydata)
 
 	d3.selectAll("#count-delays-value, #count-cancellations-value")
 		.data(data.reduce(function(a, b) { return [a[0] + b.delayed, a[1] + b.cancelled]; }, [0, 0]))
@@ -471,11 +521,11 @@ function redraw(data, time, merged_data) {
 		.transition()
 		.attr("y2", height);
 
-	var bars = chart.select("g#chart-content").selectAll("g.chart-bar")
-		.data(filtered_data)//,function(d){if (typeof filtered_data[filtered_data.indexOf(d)] !== 'undefined'){
+	var bars = chart.select("g#chart-content").selectAll("g.chart-bar") // should call key function
+		.data(filtered_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})//,function(d){if (typeof filtered_data[filtered_data.indexOf(d)] !== 'undefined'){
 			// console.log(filtered_data[filtered_data.indexOf(d)]);
 			// return filtered_data[filtered_data.indexOf(d)];}})
-	// console.log(bars)
+	console.log(bars)
 
 	bars
 		.exit().remove();
@@ -568,9 +618,10 @@ function redraw(data, time, merged_data) {
 	// console.log(merged_data[0].airport)
 	var pies = map.select("g#pies").selectAll("g")
 		// .data(merged_data,key);
-		.data(merged_data,function(d){if (typeof merged_data[merged_data.indexOf(d)] !== 'undefined'){
+		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){
 			// console.log(merged_data[merged_data.indexOf(d)]);
-			return merged_data[merged_data.indexOf(d)];}})
+			return d.aircraft;}})
+		// .enter()
 	// console.log(map.select("g#pies").selectAll("g"))
 
 	pies.selectAll("path")

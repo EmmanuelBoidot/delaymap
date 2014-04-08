@@ -2084,14 +2084,14 @@ $.format = $.validator.format;
 /* report_error.js:4d646b1db retrieved and parsed as by emit.rvt by elaan.hou.flightaware.com */
 // THIS HAS TO BE FIRST
 onerror = function(msg, url, line) {
-  report_error(msg, url, line);
+  // report_error(msg, url, line);
   return false;
 };
 
 function report_error(msg, url, line) {
   pollingActive = false;
   var img = new Image();
-  img.src = "/ajax/jserror.rvt?msg=" + encodeURIComponent(msg) + ';url=' + encodeURIComponent(url) + ";line=" + line + ";doc=" + encodeURIComponent(document.URL); 
+  img.src = "http://e1.flightcdn.com/ajax/jserror.rvt?msg=" + encodeURIComponent(msg) + ';url=' + encodeURIComponent(url) + ";line=" + line + ";doc=" + encodeURIComponent(document.URL); 
   img = null;
 }
 

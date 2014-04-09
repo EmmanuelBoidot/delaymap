@@ -13,7 +13,7 @@ var loaded_response = false;
 var time_chunk_size = d3.time.hour;
 var current_time = "1396760400000";
 var date_format = d3.time.format("%-I %p");
-var day_format = d3.time.format("%b %-d");
+var day_format = d3.time.format("%a %b %-d %Y");
 
 var play_speed = 400;
 var interval = null;
@@ -146,7 +146,43 @@ chart.append("line")
 	.attr("y1", 0)
 	.attr("class", "chart-axis");
 
+
 window.onresize = resize_bar_chart;
+
+var loading_in_progress = 0;
+// var mydata = []
+// var mymergeddata = []
+// var myfiltereddata = [];
+
+var data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
+var use_saved_data = 0;
+load_data(data_file);
+d3.select('#saved_data').style("font-weight", "normal");
+d3.select('#current_data').style("font-weight", "bold");
+// interval = setInterval(advanceMap, play_speed);
+
+d3.select('#data_choser')
+	// .append("circle")
+	// .attr("r", 5)
+	// .style("fill", "black")
+	.on('click', function(d) {
+		console.log("button clicked")
+	    if ( use_saved_data === 1 ) {
+	        use_saved_data = 0;
+	        data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
+	        d3.select('#saved_data').style("font-weight", "normal");
+			d3.select('#current_data').style("font-weight", "bold");
+	    } else {
+	    	use_saved_data = 1;
+	        data_file = "./FlightAwareMiseryMap_files/historical.rvt";
+	        d3.select('#saved_data').style("font-weight", "bold");
+			d3.select('#current_data').style("font-weight", "normal");
+	    }   
+	    load_data(data_file);
+	    // interval = setInterval(advanceMap, play_speed);
+	});
+
+
 
 // Map vector data is hardcoded in the HTML, use this to generate it from the GeoJSON source file
 // d3.json("/ajax/ignoreuser/miserymap/us.json", function(error, data) {
@@ -162,233 +198,299 @@ window.onresize = resize_bar_chart;
 // 		.attr("stroke", "#FFFFFF")
 // 		.attr("stroke-width", 0.5);
 // });
-var mydata = []
-var mymergeddata = []
-var myfiltereddata = [];
 
-d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
-// d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", function (error, data) {
-	// mydata = []
-	// for(var i = 0; i < data.data.length; i++){
-	// 	// console.log(data.data[i].airport)
-	//     var item = {airport: 			data.data[i].airport, 
-	// 		    	cancelled: 			data.data[i].cancelled,
-	// 		    	coordinates: 		data.data[i].coordinates,
-	// 				delayed: 			data.data[i].delayed,
-	// 				destinations: 		data.data[i].destinations,
-	// 				iata: 				data.data[i].iata,
-	// 				name: 				data.data[i].name,
-	// 				ontime: 			data.data[i].ontime,
-	// 				terminal_area: 		data.data[i].terminal_area};
-	//     mydata.push(item);
-	// }	
-	// data = {time:data.time, data:mydata};
-	historical_data.push(data);
-	current_time = new Date(data.time * 1000);
-	// console.log(historical_data)
-	// console.log(current_time)
+// d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
+// // d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", function (error, data) {
+// 	// mydata = []
+// 	// for(var i = 0; i < data.data.length; i++){
+// 	// 	// console.log(data.data[i].airport)
+// 	//     var item = {airport: 			data.data[i].airport, 
+// 	// 		    	cancelled: 			data.data[i].cancelled,
+// 	// 		    	coordinates: 		data.data[i].coordinates,
+// 	// 				delayed: 			data.data[i].delayed,
+// 	// 				destinations: 		data.data[i].destinations,
+// 	// 				iata: 				data.data[i].iata,
+// 	// 				name: 				data.data[i].name,
+// 	// 				ontime: 			data.data[i].ontime,
+// 	// 				terminal_area: 		data.data[i].terminal_area};
+// 	//     mydata.push(item);
+// 	// }	
+// 	// data = {time:data.time, data:mydata};
+// 	historical_data.push(data);
+// 	current_time = new Date(data.time * 1000);
+// 	// console.log(historical_data)
+// 	// console.log(current_time)
 
-	join_airports_to_data(data.data);
-	// console.log(data.data);
-	merged_data = merge_data(data.data);
-	// console.log("MAIN:\t merged_data");
-	// console.log(merged_data);
-	// var mymergeddata = []
-	// for(var i = 0; i < merged_data.length; i++){
-	// 	// console.log(merged_data[i].airport)
-	//     var item = {airport: 			merged_data[i].airport, 
-	// 		    	cancelled: 			merged_data[i].cancelled,
-	// 		    	coordinates: 		merged_data[i].coordinates,
-	// 				delayed: 			merged_data[i].delayed,
-	// 				destinations: 		merged_data[i].destinations,
-	// 				iata: 				merged_data[i].iata,
-	// 				name: 				merged_data[i].name,
-	// 				ontime: 			merged_data[i].ontime,
-	// 				terminal_area: 		merged_data[i].terminal_area};
-	//     mymergeddata.push(item);
-	// }
-	// merged_data = mymergeddata;
-	// console.log("MAIN:\t mymergeddata");
-	// console.log(mymergeddata);
+// 	join_airports_to_data(data.data);
+// 	// console.log(data.data);
+// 	merged_data = merge_data(data.data);
+// 	// console.log("MAIN:\t merged_data");
+// 	// console.log(merged_data);
+// 	// var mymergeddata = []
+// 	// for(var i = 0; i < merged_data.length; i++){
+// 	// 	// console.log(merged_data[i].airport)
+// 	//     var item = {airport: 			merged_data[i].airport, 
+// 	// 		    	cancelled: 			merged_data[i].cancelled,
+// 	// 		    	coordinates: 		merged_data[i].coordinates,
+// 	// 				delayed: 			merged_data[i].delayed,
+// 	// 				destinations: 		merged_data[i].destinations,
+// 	// 				iata: 				merged_data[i].iata,
+// 	// 				name: 				merged_data[i].name,
+// 	// 				ontime: 			merged_data[i].ontime,
+// 	// 				terminal_area: 		merged_data[i].terminal_area};
+// 	//     mymergeddata.push(item);
+// 	// }
+// 	// merged_data = mymergeddata;
+// 	// console.log("MAIN:\t mymergeddata");
+// 	// console.log(mymergeddata);
 
-	// Draw pie charts
-	// console.log(merged_data)
-	// var my_airports = map.select("g#pies").selectAll("g")
-	// console.log(my_airports)
-	// my_airports = my_airports.data(merged_data, key);
-	// console.log(my_airports)
-	var pies = map.select("g#pies").selectAll("g")
-		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
-			return d.airport;}})
-		// .data(merged_data,key)
-		.enter().append("g")
-		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
-		.attr("class", "pie");
-	// console.log("MAIN:\t pies")
-	// console.log(pies);
+// 	// Draw pie charts
+// 	// console.log(merged_data)
+// 	// var my_airports = map.select("g#pies").selectAll("g")
+// 	// console.log(my_airports)
+// 	// my_airports = my_airports.data(merged_data, key);
+// 	// console.log(my_airports)
+// 	var pies = map.select("g#pies").selectAll("g")
+// 		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
+// 			return d.airport;}})
+// 		// .data(merged_data,key)
+// 		.enter().append("g")
+// 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
+// 		.attr("class", "pie");
+// 	// console.log("MAIN:\t pies")
+// 	// console.log(pies);
 
-	pies.selectAll("path")
-		.data(function(d, i) { return pie([d, d], i); })
-		.enter().append("path")
-		.each(function(d) { this._current = d; }); // store the initial values for animation tweening
-	console.log(pies.selectAll("path"));
+// 	pies.selectAll("path")
+// 		.data(function(d, i) { return pie([d, d], i); })
+// 		.enter().append("path")
+// 		.each(function(d) { this._current = d; }); // store the initial values for animation tweening
+// 	console.log(pies.selectAll("path"));
 
-	pies.selectAll("text")
-		.data(function(d) { return [d]; })
-		.enter().append("text")
-		.text(function(d) { return ("terminal_area" in d ? d.terminal_area : d.iata); })
-		.attr("dy", ".35em")
-		.attr("text-anchor", "middle");
+// 	pies.selectAll("text")
+// 		.data(function(d) { return [d]; })
+// 		.enter().append("text")
+// 		.text(function(d) { return ("terminal_area" in d ? d.terminal_area : d.iata); })
+// 		.attr("dy", ".35em")
+// 		.attr("text-anchor", "middle");
 
-	// Add transparent circle to make it easier for users to select airports
-	pies.selectAll("circle")
-		.data(function(d) { return [d]; })
-		.enter().append("circle")
-		.attr("cx", 0)
-		.attr("cy", 0)
-		.style("stroke", "none")
-		.style("fill", "transparent");
+// 	// Add transparent circle to make it easier for users to select airports
+// 	pies.selectAll("circle")
+// 		.data(function(d) { return [d]; })
+// 		.enter().append("circle")
+// 		.attr("cx", 0)
+// 		.attr("cy", 0)
+// 		.style("stroke", "none")
+// 		.style("fill", "transparent");
 
-	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
-			// console.log(merged_data[merged_data.indexOf(d)]);
-			return d.airport;}})
-		.enter().append("circle")
-		.attr("r", 0)
-		.attr("cx", function(d) { return projection(d.coordinates)[0]; })
-		.attr("cy", function(d) { return projection(d.coordinates)[1]; })
-		.style("fill", "black");
+// 	map.select("#map-mask-airport").selectAll("circle")
+// 		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
+// 			// console.log(merged_data[merged_data.indexOf(d)]);
+// 			return d.airport;}})
+// 		.enter().append("circle")
+// 		.attr("r", 0)
+// 		.attr("cx", function(d) { return projection(d.coordinates)[0]; })
+// 		.attr("cy", function(d) { return projection(d.coordinates)[1]; })
+// 		.style("fill", "black");
 
-	redraw(data.data, current_time, merged_data);
+// 	redraw(data.data, current_time, merged_data);
 
+function load_data(file_str){
 	// TODO : We should be doing the two ajax calls parallel, but we need a way to guarantee the first one finished before the second one
-	d3.json("./FlightAwareMiseryMap_files/historical.rvt", function (error, data) {
-	// d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt", function (error, data) {
-		// console.log(data);
-		// var mydata = []
-		// for(var i = 0; i < data.length; i++){
-		// 	// console.log(merged_data[i].airport)
-		// 	item_data = []
-		// 	for (var j = 0; j < data[i].data.length; j++){
-		// 	    var item = {airport: 			data[i].data[j].airport, 
-		// 			    	cancelled: 			data[i].data[j].cancelled,
-		// 			    	coordinates: 		data[i].data[j].coordinates,
-		// 					delayed: 			data[i].data[j].delayed,
-		// 					destinations: 		data[i].data[j].destinations,
-		// 					iata: 				data[i].data[j].iata,
-		// 					name: 				data[i].data[j].name,
-		// 					ontime: 			data[i].data[j].ontime,
-		// 					terminal_area: 		data[i].data[j].terminal_area};
-		// 	    item_data.push(item);
-		// 	}
-		// 	mydata.push({time:data[i].time, data:item_data})
-		// }
-		// data = mydata;
-		historical_data = historical_data.concat(data);
-		console.log(historical_data);
-		// current_time = new Date(data.time * 1000);
-		var data = [[], []];
+	if (loading_in_progress === 0){
+		loading_in_progress = 1;
+		d3.select("#timeline-loading").style("display", "null");
 
-		historical_data.forEach(function(slice) {
-			slice.time = new Date(slice.time * 1000);
-			data[0].push({
-				x: slice.time,
-				y: slice.data.reduce(function(a, b) { return a + b.ontime; }, 0)
+		d3.json(file_str, function (error, data) {
+			historical_data = []
+		// d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt", function (error, data) {
+			// console.log(data);
+			// var mydata = []
+			// for(var i = 0; i < data.length; i++){
+			// 	// console.log(merged_data[i].airport)
+			// 	item_data = []
+			// 	for (var j = 0; j < data[i].data.length; j++){
+			// 	    var item = {airport: 			data[i].data[j].airport, 
+			// 			    	cancelled: 			data[i].data[j].cancelled,
+			// 			    	coordinates: 		data[i].data[j].coordinates,
+			// 					delayed: 			data[i].data[j].delayed,
+			// 					destinations: 		data[i].data[j].destinations,
+			// 					iata: 				data[i].data[j].iata,
+			// 					name: 				data[i].data[j].name,
+			// 					ontime: 			data[i].data[j].ontime,
+			// 					terminal_area: 		data[i].data[j].terminal_area};
+			// 	    item_data.push(item);
+			// 	}
+			// 	mydata.push({time:data[i].time, data:item_data})
+			// }
+			// data = mydata;
+			historical_data = historical_data.concat(data);
+			console.log(historical_data);
+
+			current_time = new Date(historical_data[0].time * 1000);
+			console.log(historical_data[0].time);
+			join_airports_to_data(historical_data[0].data);
+			// console.log(data.data);
+			merged_data = merge_data(historical_data[0].data);
+
+			// Remove previous graphical elements
+			map.select("g#pies").selectAll("g").remove();
+			map.select("g#bars").selectAll("g").remove();
+			timeline.select("g#x-axis").remove();
+			timeline.select("g#timeline-graph").selectAll("path").remove();
+			timeline.select("g#timeline-marker").selectAll("path").remove();
+			timeline.select("g#timeline-hovermarker").selectAll("path").remove();
+
+
+
+			var pies = map.select("g#pies").selectAll("g")
+				.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
+					return d.airport;}})
+				// .data(merged_data,key)
+				.enter().append("g")
+				.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
+				.attr("class", "pie");
+			// console.log("MAIN:\t pies")
+			// console.log(pies);
+
+			pies.selectAll("path")
+				.data(function(d, i) { return pie([d, d], i); })
+				.enter().append("path")
+				.each(function(d) { this._current = d; }); // store the initial values for animation tweening
+			console.log(pies.selectAll("path"));
+
+			pies.selectAll("text")
+				.data(function(d) { return [d]; })
+				.enter().append("text")
+				.text(function(d) { return ("terminal_area" in d ? d.terminal_area : d.iata); })
+				.attr("dy", ".35em")
+				.attr("text-anchor", "middle");
+
+			// Add transparent circle to make it easier for users to select airports
+			pies.selectAll("circle")
+				.data(function(d) { return [d]; })
+				.enter().append("circle")
+				.attr("cx", 0)
+				.attr("cy", 0)
+				.style("stroke", "none")
+				.style("fill", "transparent");
+
+			map.select("#map-mask-airport").selectAll("circle")
+				.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
+					// console.log(merged_data[merged_data.indexOf(d)]);
+					return d.airport;}})
+				.enter().append("circle")
+				.attr("r", 0)
+				.attr("cx", function(d) { return projection(d.coordinates)[0]; })
+				.attr("cy", function(d) { return projection(d.coordinates)[1]; })
+				.style("fill", "black");
+
+			var data = [[], []];
+
+			historical_data.forEach(function(slice) {
+				slice.time = new Date(slice.time * 1000);
+				data[0].push({
+					x: slice.time,
+					y: slice.data.reduce(function(a, b) { return a + b.ontime; }, 0)
+				});
+				data[1].push({
+					x: slice.time,
+					y: slice.data.reduce(function(a, b) { return a + (b.delayed + b.cancelled); }, 0)
+				});
 			});
-			data[1].push({
-				x: slice.time,
-				y: slice.data.reduce(function(a, b) { return a + (b.delayed + b.cancelled); }, 0)
+
+			time_scale = d3.time.scale()
+				.domain(d3.extent(data[0], function(d) { return d.x }))
+				.range([0, timeline_width]);
+
+			var timeline_area = d3.svg.area()
+				.x(function(d) { return time_scale(d.x); })
+				.y0(function(d) { return timeline_y(d.y0 + d.y); })
+				.y1(function(d) { return timeline_y(d.y0); });
+
+			var timeline_x_axis = d3.svg.axis()
+				.scale(time_scale)
+				.orient("bottom")
+				.ticks(d3.time.days, 1)
+				.tickFormat(d3.time.format("%b %-d"))
+				.tickSubdivide(23)
+				.tickSize(8,4,4);
+
+			var stacked_data = timeline_stack(data);
+
+			timeline_y.domain([0, d3.max(stacked_data[1], function(d) { return d.y + d.y0 }) + 500]);
+
+			timeline.select("g#timeline-graph").selectAll("path")
+				.data(stacked_data)
+				.enter().append("path")
+				.attr("d", timeline_area)
+				.attr("class", function(d, i) { return (i == 0 ? "ontime" : "delayed"); });
+
+			//Draw timeline markers
+			timeline.append("g")
+				.attr("id", "x-axis")
+				.call(timeline_x_axis);
+
+			marker
+				.datum(current_time)
+				.attr("transform", function(d) { return "translate(" + time_scale(d) + ",0)"; });
+
+			timeline.on("mousemove", function() {
+				closest_slice = getClosestSlice(d3.mouse(this)[0]);
+
+				hovermarker
+					.datum(closest_slice.time)
+					.attr("transform", function(d) { return "translate(" + time_scale(d) + ",0)"; })
+					.style("display", "block");;
+
+				hovermarker.select("text")
+					.datum(closest_slice.time)
+					.text(date_format);
+			}).on("click", function() {
+				hovermarker
+					.style("display", "none");
+
+				// OK
+				closest_slice = getClosestSlice(d3.mouse(this)[0]);
+
+				// OK
+				drawTimelineMarker(closest_slice.time);
+
+				redraw(closest_slice.data, closest_slice.time);
+				// console.log(closest_slice.time)
+				// console.log(closest_slice.data)
+
+				fade_out_popup();
+
+				resize_bar_chart();
+
+				// update_url(closest_slice.time.getTime() / 1000, null);
+			}).on("mouseleave", function() {
+				hovermarker
+					.style("display", "none");
 			});
+
+			// Preload all the weather images
+			historical_data.forEach(function(slice) {
+				new Image().src = get_weather_url_at_time(slice.time);
+			});
+
+			d3.select("#timeline-loading").style("display", "none");
+			d3.select("svg#timeline").style("display", "block");
+			
+			if (typeof response_time !== 'undefined') {
+				var new_time = new Date(response_time * 1000);
+				// console.log(new_time);
+				closest_slice = getClosestSliceFromTime(response_time);
+				drawTimelineMarker(closest_slice.time);
+				redraw(closest_slice.data, closest_slice.time);
+			}
+
+			redraw(historical_data[0].data, historical_data[0].time,merged_data);
 		});
-
-		time_scale = d3.time.scale()
-			.domain(d3.extent(data[0], function(d) { return d.x }))
-			.range([0, timeline_width]);
-
-		var timeline_area = d3.svg.area()
-			.x(function(d) { return time_scale(d.x); })
-			.y0(function(d) { return timeline_y(d.y0 + d.y); })
-			.y1(function(d) { return timeline_y(d.y0); });
-
-		var timeline_x_axis = d3.svg.axis()
-			.scale(time_scale)
-			.orient("bottom")
-			.ticks(d3.time.days, 1)
-			.tickFormat(d3.time.format("%b %-d"))
-			.tickSubdivide(23)
-			.tickSize(8,4,4);
-
-		var stacked_data = timeline_stack(data);
-
-		timeline_y.domain([0, d3.max(stacked_data[1], function(d) { return d.y + d.y0 }) + 500]);
-
-		timeline.select("g#timeline-graph").selectAll("path")
-			.data(stacked_data)
-			.enter().append("path")
-			.attr("d", timeline_area)
-			.attr("class", function(d, i) { return (i == 0 ? "ontime" : "delayed"); });
-
-		//Draw timeline markers
-		timeline.append("g")
-			.attr("id", "x-axis")
-			.call(timeline_x_axis);
-
-		marker
-			.datum(current_time)
-			.attr("transform", function(d) { return "translate(" + time_scale(d) + ",0)"; });
-
-		timeline.on("mousemove", function() {
-			closest_slice = getClosestSlice(d3.mouse(this)[0]);
-
-			hovermarker
-				.datum(closest_slice.time)
-				.attr("transform", function(d) { return "translate(" + time_scale(d) + ",0)"; })
-				.style("display", "block");;
-
-			hovermarker.select("text")
-				.datum(closest_slice.time)
-				.text(date_format);
-		}).on("click", function() {
-			hovermarker
-				.style("display", "none");
-
-			// OK
-			closest_slice = getClosestSlice(d3.mouse(this)[0]);
-
-			// OK
-			drawTimelineMarker(closest_slice.time);
-
-			redraw(closest_slice.data, closest_slice.time);
-			// console.log(closest_slice.time)
-			// console.log(closest_slice.data)
-
-			fade_out_popup();
-
-			resize_bar_chart();
-
-			// update_url(closest_slice.time.getTime() / 1000, null);
-		}).on("mouseleave", function() {
-			hovermarker
-				.style("display", "none");
-		});
-
-		// Preload all the weather images
-		historical_data.forEach(function(slice) {
-			new Image().src = get_weather_url_at_time(slice.time);
-		});
-
-		d3.select("#timeline-loading").style("display", "none");
-		d3.select("svg#timeline").style("display", "block");
-		
-		if (typeof response_time !== 'undefined') {
-			var new_time = new Date(response_time * 1000);
-			// console.log(new_time);
-			closest_slice = getClosestSliceFromTime(response_time);
-			drawTimelineMarker(closest_slice.time);
-			redraw(closest_slice.data, closest_slice.time);
-		}
-	});
-});
+	}
+	loading_in_progress = 0;
+}
+// });
 
 
 function key(d) {

@@ -455,22 +455,22 @@ function redraw(data, time, merged_data) {
 		join_airports_to_data(data);
 		var merged_data = merge_data(data);
 	}
-	// var mymergeddata = []
-	// for(var i = 0; i < merged_data.length; i++){
-	// 	// console.log(merged_data[i].airport)
-	//     var item = {airport: 			merged_data[i].airport, 
-	// 		    	cancelled: 			merged_data[i].cancelled,
-	// 		    	coordinates: 		merged_data[i].coordinates,
-	// 				delayed: 			merged_data[i].delayed,
-	// 				destinations: 		merged_data[i].destinations,
-	// 				iata: 				merged_data[i].iata,
-	// 				name: 				merged_data[i].name,
-	// 				ontime: 			merged_data[i].ontime,
-	// 				terminal_area: 		merged_data[i].terminal_area};
-	//     mymergeddata.push(item);
-	// }
+	var mymergeddata = []
+	for(var i = 0; i < merged_data.length; i++){
+		// console.log(merged_data[i].airport)
+	    var item = {airport: 			merged_data[i].airport, 
+			    	cancelled: 			merged_data[i].cancelled,
+			    	coordinates: 		merged_data[i].coordinates,
+					delayed: 			merged_data[i].delayed,
+					destinations: 		merged_data[i].destinations,
+					iata: 				merged_data[i].iata,
+					name: 				merged_data[i].name,
+					ontime: 			merged_data[i].ontime,
+					terminal_area: 		merged_data[i].terminal_area};
+	    mymergeddata.push(item);
+	}
 	merged_data = mymergeddata;
-	// console.log(data);
+	// console.log(merged_data);
 	console.log("REDRAW:\t merged_data")
 	console.log(merged_data);
 	console.log("REDRAW:\t data")
@@ -539,12 +539,6 @@ function redraw(data, time, merged_data) {
 			// return filtered_data[filtered_data.indexOf(d)];}})
 	console.log("REDRAW:\t bars");
 	console.log(bars)
-
-	var pies = map.select("g#pies").selectAll("g")
-		// .data(merged_data,key);
-		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}}).enter()
-	console.log("REDRAW:\t pies");
-	console.log(pies)
 
 	bars
 		.exit().remove();
@@ -636,13 +630,10 @@ function redraw(data, time, merged_data) {
 		.style("fill", "black")
 		.attr("class", "chart-bar-legendlabel");
 
-	// console.log(merged_data[0].airport)
 	var pies = map.select("g#pies").selectAll("g")
 		// .data(merged_data,key);
-		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){
-			// console.log(merged_data[merged_data.indexOf(d)]);
-			return d.aircraft;}})
-		// .enter()
+		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
+	console.log("REDRAW:\t pies");
 	console.log(pies)
 
 	pies

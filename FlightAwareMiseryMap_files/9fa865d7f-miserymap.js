@@ -177,11 +177,13 @@ window.onresize = resize_bar_chart;
 // 		.attr("stroke", "#FFFFFF")
 // 		.attr("stroke-width", 0.5);
 // });
-// var mydata = []
+var mydata = []
+var mymergeddata = []
+var myfiltereddata = [];
 
 // d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", function (error, data) {
-	var mydata = []
+	mydata = []
 	for(var i = 0; i < data.data.length; i++){
 		// console.log(data.data[i].airport)
 	    var item = {airport: 			data.data[i].airport, 
@@ -230,13 +232,13 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 	// my_airports = my_airports.data(merged_data, key);
 	// console.log(my_airports)
 	var pies = map.select("g#pies").selectAll("g")
-		.data(mydata,function(d, i){if (typeof d !== 'undefined'){
-			// console.log(merged_data[merged_data.indexOf(d)]);
+		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
 			return d.airport;}})
 		// .data(merged_data,key)
 		.enter().append("g")
 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
 		.attr("class", "pie");
+	console.log("MAIN:\t pies")
 	console.log(pies);
 
 	pies.selectAll("path")
@@ -262,7 +264,7 @@ d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", functi
 		.style("fill", "transparent");
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(mydata,function(d, i){if (typeof d !== 'undefined'){
+		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
 			// console.log(merged_data[merged_data.indexOf(d)]);
 			return d.airport;}})
 		.enter().append("circle")
@@ -448,30 +450,31 @@ function arcTween(a) {
 
 
 function redraw(data, time, merged_data) {
-
 	// The last argument is optional, if it wasn't passed, then we need to merge the data ourselves
 	if (typeof merged_data === "undefined") {
 		join_airports_to_data(data);
 		var merged_data = merge_data(data);
-		// var mymergeddata = []
-		// for(var i = 0; i < merged_data.length; i++){
-		// 	// console.log(merged_data[i].airport)
-		//     var item = {airport: 			merged_data[i].airport, 
-		// 		    	cancelled: 			merged_data[i].cancelled,
-		// 		    	coordinates: 		merged_data[i].coordinates,
-		// 				delayed: 			merged_data[i].delayed,
-		// 				destinations: 		merged_data[i].destinations,
-		// 				iata: 				merged_data[i].iata,
-		// 				name: 				merged_data[i].name,
-		// 				ontime: 			merged_data[i].ontime,
-		// 				terminal_area: 		merged_data[i].terminal_area};
-		//     mymergeddata.push(item);
-		// }
-		// merged_data = mymergeddata;
 	}
+	// var mymergeddata = []
+	// for(var i = 0; i < merged_data.length; i++){
+	// 	// console.log(merged_data[i].airport)
+	//     var item = {airport: 			merged_data[i].airport, 
+	// 		    	cancelled: 			merged_data[i].cancelled,
+	// 		    	coordinates: 		merged_data[i].coordinates,
+	// 				delayed: 			merged_data[i].delayed,
+	// 				destinations: 		merged_data[i].destinations,
+	// 				iata: 				merged_data[i].iata,
+	// 				name: 				merged_data[i].name,
+	// 				ontime: 			merged_data[i].ontime,
+	// 				terminal_area: 		merged_data[i].terminal_area};
+	//     mymergeddata.push(item);
+	// }
+	merged_data = mymergeddata;
 	// console.log(data);
 	console.log("REDRAW:\t merged_data")
 	console.log(merged_data);
+	console.log("REDRAW:\t data")
+	console.log(data);
 	// data = merged_data;
 
 	d3.selectAll("#count-delays-value, #count-cancellations-value")
@@ -489,10 +492,10 @@ function redraw(data, time, merged_data) {
 	var today = new Date().setHours(0,0,0,0);
 	var startime_day = new Date(startime.getTime()).setHours(0,0,0,0);
 	if(startime_day != today)
-		starttime_display = day_format(startime) + " " + starttime_display;
+		starttime_display = day_format(startime) + ", " + starttime_display;
 
 	if(startime_day != new Date(stoptime.getTime()).setHours(0,0,0,0))
-		stoptime_display = day_format(stoptime) + " " + stoptime_display;
+		stoptime_display = day_format(stoptime) + ", " + stoptime_display;
 
 	d3.selectAll("#starttime, #stoptime")
 		.data([starttime_display, stoptime_display])
@@ -501,13 +504,18 @@ function redraw(data, time, merged_data) {
 	var airport_sort = function(a,b) { return d3.descending(a.delayed + a.cancelled, b.delayed + b.cancelled); };
 	// Limit result to top 16
 	// var filtered_data = data.filter(function(d) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort).slice(0, 20);
-	var filtered_data = data.filter(function(d,i) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort);
+	filtered_data = data.filter(function(d,i) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort);
 	// console.log(data);
 	console.log(filtered_data);
 	// console.log(filtered_data[0].airport)
 
+	mydata = data;
+	mymergeddata=merged_data;
+	myfiltereddata = filtered_data;
+	mytime = time;
+	// data=mydata;merged_data=mymergeddata;filtered_data=myfiltereddata;time=mytime;
+
 	var height = filtered_data.length * 20;
-	// console.log(height);
 
 	d3.select("svg#chart").style("height", height.toString() + 'px');
 	resize_bar_chart();
@@ -532,6 +540,12 @@ function redraw(data, time, merged_data) {
 	console.log("REDRAW:\t bars");
 	console.log(bars)
 
+	var pies = map.select("g#pies").selectAll("g")
+		// .data(merged_data,key);
+		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}}).enter()
+	console.log("REDRAW:\t pies");
+	console.log(pies)
+
 	bars
 		.exit().remove();
 
@@ -539,6 +553,8 @@ function redraw(data, time, merged_data) {
 		.enter().append("g")
 		.attr("class", "chart-bar")
 		.on("mouseenter", function(d) {
+			console.log("REDRAW:\t bars.d")
+			console.log(d);
 			highlightAirport(get_pie_from_bar(d), merged_data);
 			drawTracks(get_pie_from_bar(d), merged_data);
 		}).on("click", function(d) {
@@ -627,7 +643,8 @@ function redraw(data, time, merged_data) {
 			// console.log(merged_data[merged_data.indexOf(d)]);
 			return d.aircraft;}})
 		// .enter()
-	// console.log(map.select("g#pies").selectAll("g"))
+	console.log(pies)
+
 	pies
 		.on("mouseenter", function(d) {
 			highlightAirport(d3.select(this), merged_data);
@@ -1031,8 +1048,12 @@ function join_airports_to_data(data) {
 };
 
 function get_pie_from_bar(d) {
-	// console.log(map.selectAll("g#pies > g"))
-	return map.selectAll("g#pies > g").filter(function(e,i) { return e.airport.indexOf(d.airport) !== -1; });
+	console.log(map.selectAll("g#pies > g"))
+	return map.selectAll("g#pies > g").filter(function(e) { 
+		// console.log("GETPIEFROMBAR:\t e.airport.indexOf(d.airport)")
+		console.log(e.airport)
+		// console.log(e.airport.indexOf("KORD"))
+		return e.airport.indexOf(d.airport) !== -1; });
 }
 
 function get_weather_url_at_time(time) {

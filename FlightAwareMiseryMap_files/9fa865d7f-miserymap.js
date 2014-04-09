@@ -8,21 +8,6 @@ this.__chart__=k,x.append("line"),x.append("text");var N=x.select("line"),q=_.se
  
 /* miserymap.js:9fa865d7f retrieved and parsed as by emit.rvt by elaan.hou.flightaware.com */
 
-// function name(d) {
-//   return d.name;
-// }
-
-// var letters;
-// letters = [
-//   {name: "A", frequency: .08167},
-//   {name: "B", frequency: .01492},
-//   {name: "C", frequency: .02780},
-//   {name: "D", frequency: .04253},
-//   {name: "E", frequency: .12702}
-// ];
-
-// d3.selectAll("div").data(letters);
-
 var loaded_response = false;
 
 var time_chunk_size = d3.time.hour;
@@ -200,7 +185,7 @@ d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 	// data = {time:data.time, data:mydata};
 	historical_data.push(data);
 	current_time = new Date(data.time * 1000);
-	console.log(historical_data)
+	// console.log(historical_data)
 	// console.log(current_time)
 
 	join_airports_to_data(data.data);
@@ -239,8 +224,8 @@ d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 		.enter().append("g")
 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
 		.attr("class", "pie");
-	console.log("MAIN:\t pies")
-	console.log(pies);
+	// console.log("MAIN:\t pies")
+	// console.log(pies);
 
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
@@ -457,21 +442,21 @@ function redraw(data, time, merged_data) {
 		join_airports_to_data(data);
 		var merged_data = merge_data(data);
 	}
-	var mymergeddata = []
-	for(var i = 0; i < merged_data.length; i++){
-		// console.log(merged_data[i].airport)
-	    var item = {airport: 			merged_data[i].airport, 
-			    	cancelled: 			merged_data[i].cancelled,
-			    	coordinates: 		merged_data[i].coordinates,
-					delayed: 			merged_data[i].delayed,
-					destinations: 		merged_data[i].destinations,
-					iata: 				merged_data[i].iata,
-					name: 				merged_data[i].name,
-					ontime: 			merged_data[i].ontime,
-					terminal_area: 		merged_data[i].terminal_area};
-	    mymergeddata.push(item);
-	}
-	merged_data = mymergeddata;
+	// var mymergeddata = []
+	// for(var i = 0; i < merged_data.length; i++){
+	// 	// console.log(merged_data[i].airport)
+	//     var item = {airport: 			merged_data[i].airport, 
+	// 		    	cancelled: 			merged_data[i].cancelled,
+	// 		    	coordinates: 		merged_data[i].coordinates,
+	// 				delayed: 			merged_data[i].delayed,
+	// 				destinations: 		merged_data[i].destinations,
+	// 				iata: 				merged_data[i].iata,
+	// 				name: 				merged_data[i].name,
+	// 				ontime: 			merged_data[i].ontime,
+	// 				terminal_area: 		merged_data[i].terminal_area};
+	//     mymergeddata.push(item);
+	// }
+	// merged_data = mymergeddata;
 	// console.log(merged_data);
 	console.log("REDRAW:\t merged_data")
 	console.log(merged_data);
@@ -551,6 +536,9 @@ function redraw(data, time, merged_data) {
 		.on("mouseenter", function(d) {
 			console.log("REDRAW:\t bars.d")
 			console.log(d);
+			thisbar = get_pie_from_bar(d);
+			console.log(thisbar);
+			for (var i=0;i<merged_data.length;i++) {console.log(merged_data[i].airport);}
 			highlightAirport(get_pie_from_bar(d), merged_data);
 			drawTracks(get_pie_from_bar(d), merged_data);
 		}).on("click", function(d) {
@@ -641,10 +629,12 @@ function redraw(data, time, merged_data) {
 
 	pies
 		.on("mouseenter", function(d) {
+			console.log("PIES:\t mouseenter")
 			highlightAirport(d3.select(this), merged_data);
 			drawTracks(d3.select(this), merged_data);
 			reset_popup_timer();
 		}).on("click", function(d) {
+			console.log("PIES:\t click")
 			if (!selected_airport || selected_airport.datum() !== d) {
 				if (selected_airport)
 					removeSelection(selected_airport);
@@ -722,6 +712,8 @@ function redraw(data, time, merged_data) {
 			}
 		});
 	console.log(map.selectAll("g#pies > g"))
+	console.log("REDRAW:\t pies");
+	console.log(pies)
 
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
@@ -777,6 +769,10 @@ function redraw(data, time, merged_data) {
 
 function drawTracks(element, data) {
 	var airport = element.datum();
+	console.log("DRAWTRACKS:\t airport")
+	console.log(airport)
+	console.log("DRAWTRACKS:\t data")
+	console.log(data)	
 
 	var diagonal = d3.svg.diagonal()
 		.source({x: projection(airport.coordinates)[0], y: projection(airport.coordinates)[1]})
@@ -791,14 +787,18 @@ function drawTracks(element, data) {
 	var animate_tracks = map.select("g#tracks").selectAll("path")[0].length < 1;
 
 	var tracks = map.select("g#tracks").selectAll("path")
-		.data(data, key);
+		.data(data, function(d,i){if (typeof d !== 'undefined'){return d.airport; }});
 
 	tracks
 		.enter().append("path")
 		.style("stroke", colors.ontime);
+	console.log("DRAWTRACKS:\t tracks")
+	console.log(map.select("g#tracks").selectAll("path"))
 
 	tracks
 		.exit().remove();
+	console.log("DRAWTRACKS:\t tracks")
+	console.log(map.select("g#tracks").selectAll("path"))
 
 	tracks
 		.on("click", function(d) {
@@ -973,7 +973,7 @@ function highlightAirport(airport, data) {
 		});
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(data, key)
+		.data(data, function(d,i){if(typeof d !== "undefined"){return d.airport;}})
 		.transition()
 		.attr("r", function(d) {
 			radius = outer_radius({data: d}) + 2;
@@ -1007,7 +1007,7 @@ function removeHighlight(airport) {
 
 	map.select("#map-mask-airport").selectAll("circle")
 		.transition()
-		.attr("r", function(d) { return outer_radius({data: d}) + 2; });
+		.attr("r", function(d) { if (typeof d !== 'undefined'){return outer_radius({data: d}) + 2;} });
 }
 
 function selectAirport(airport) {
@@ -1041,10 +1041,10 @@ function join_airports_to_data(data) {
 };
 
 function get_pie_from_bar(d) {
-	console.log(map.selectAll("g#pies > g"))
+	// console.log(map.selectAll("g#pies > g"))
 	return map.selectAll("g#pies > g").filter(function(e) { 
 		if (typeof e !== "undefined"){
-			console.log(e)
+			// console.log(e)
 			// if (typeof e.airport !== "undefined"){
 				return e.airport.indexOf(d.airport) !== -1;
 			// }

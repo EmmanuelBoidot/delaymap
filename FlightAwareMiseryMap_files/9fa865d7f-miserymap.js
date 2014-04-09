@@ -183,21 +183,21 @@ var myfiltereddata = [];
 
 d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 // d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", function (error, data) {
-	mydata = []
-	for(var i = 0; i < data.data.length; i++){
-		// console.log(data.data[i].airport)
-	    var item = {airport: 			data.data[i].airport, 
-			    	cancelled: 			data.data[i].cancelled,
-			    	coordinates: 		data.data[i].coordinates,
-					delayed: 			data.data[i].delayed,
-					destinations: 		data.data[i].destinations,
-					iata: 				data.data[i].iata,
-					name: 				data.data[i].name,
-					ontime: 			data.data[i].ontime,
-					terminal_area: 		data.data[i].terminal_area};
-	    mydata.push(item);
-	}	
-	data = {time:data.time, data:mydata};
+	// mydata = []
+	// for(var i = 0; i < data.data.length; i++){
+	// 	// console.log(data.data[i].airport)
+	//     var item = {airport: 			data.data[i].airport, 
+	// 		    	cancelled: 			data.data[i].cancelled,
+	// 		    	coordinates: 		data.data[i].coordinates,
+	// 				delayed: 			data.data[i].delayed,
+	// 				destinations: 		data.data[i].destinations,
+	// 				iata: 				data.data[i].iata,
+	// 				name: 				data.data[i].name,
+	// 				ontime: 			data.data[i].ontime,
+	// 				terminal_area: 		data.data[i].terminal_area};
+	//     mydata.push(item);
+	// }	
+	// data = {time:data.time, data:mydata};
 	historical_data.push(data);
 	current_time = new Date(data.time * 1000);
 	console.log(historical_data)
@@ -279,26 +279,26 @@ d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
 	// TODO : We should be doing the two ajax calls parallel, but we need a way to guarantee the first one finished before the second one
 	d3.json("./FlightAwareMiseryMap_files/historical.rvt", function (error, data) {
 	// d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt", function (error, data) {
-		console.log(data);
-		var mydata = []
-		for(var i = 0; i < data.length; i++){
-			// console.log(merged_data[i].airport)
-			item_data = []
-			for (var j = 0; j < data[i].data.length; j++){
-			    var item = {airport: 			data[i].data[j].airport, 
-					    	cancelled: 			data[i].data[j].cancelled,
-					    	coordinates: 		data[i].data[j].coordinates,
-							delayed: 			data[i].data[j].delayed,
-							destinations: 		data[i].data[j].destinations,
-							iata: 				data[i].data[j].iata,
-							name: 				data[i].data[j].name,
-							ontime: 			data[i].data[j].ontime,
-							terminal_area: 		data[i].data[j].terminal_area};
-			    item_data.push(item);
-			}
-			mydata.push({time:data[i].time, data:item_data})
-		}
-		data = mydata;
+		// console.log(data);
+		// var mydata = []
+		// for(var i = 0; i < data.length; i++){
+		// 	// console.log(merged_data[i].airport)
+		// 	item_data = []
+		// 	for (var j = 0; j < data[i].data.length; j++){
+		// 	    var item = {airport: 			data[i].data[j].airport, 
+		// 			    	cancelled: 			data[i].data[j].cancelled,
+		// 			    	coordinates: 		data[i].data[j].coordinates,
+		// 					delayed: 			data[i].data[j].delayed,
+		// 					destinations: 		data[i].data[j].destinations,
+		// 					iata: 				data[i].data[j].iata,
+		// 					name: 				data[i].data[j].name,
+		// 					ontime: 			data[i].data[j].ontime,
+		// 					terminal_area: 		data[i].data[j].terminal_area};
+		// 	    item_data.push(item);
+		// 	}
+		// 	mydata.push({time:data[i].time, data:item_data})
+		// }
+		// data = mydata;
 		historical_data = historical_data.concat(data);
 		console.log(historical_data);
 		// current_time = new Date(data.time * 1000);
@@ -1085,6 +1085,8 @@ function degrees_to_meters(input) {
 function merge_data(data) {
 	var result = [];
 
+	console.log("MERGEDATA:\t data");
+	console.log(data)
 	var already_merged = [];
 	for (var i = 0; i < data.length; i++) {
 		if (already_merged.indexOf(i) === -1) {
@@ -1098,6 +1100,8 @@ function merge_data(data) {
 			result.push(merged_airport);
 		}
 	}
+	console.log("MERGEDATA:\t merged_data");
+	console.log(result)
 	// var test = result.map(function(d) {
 	// 	console.log(result[result.indexOf(d)]);
 	//     return {

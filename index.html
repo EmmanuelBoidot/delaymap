@@ -8,9 +8,9 @@ header("Access-Control-Allow-Origin: *");
 	
 	<meta name="description" content="The delaymap is a research tool to visualize the correlation between delays on different spots of the NAS.">
 
-	<!-- <link rel="canonical" href="./FlightAwareMiseryMap_files/FlightAwareMiseryMap.html"> -->
+	<!-- <link rel="canonical" href="./staticfiles/FlightAwareMiseryMap.html"> -->
 
-	<link rel="stylesheet" type="text/css" href="./FlightAwareMiseryMap_files/2ee4a9357-miserymap.css">
+	<link rel="stylesheet" type="text/css" href="./staticfiles/2ee4a9357-miserymap.css">
 
 	<!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>-->
 	<script> var hostname = "http://e1.flightcdn.com"; </script>
@@ -24,7 +24,7 @@ header("Access-Control-Allow-Origin: *");
 	<tbody><tr>
 		<td>
 
-			<img src="./FlightAwareMiseryMap_files/warning.png" alt="Your browser is unsupported" style="padding-top: 20px;">
+			<img src="./staticfiles/warning.png" alt="Your browser is unsupported" style="padding-top: 20px;">
 
 			<h1>Your browser is unsupported</h1>
 			<p>This application requires advanced functionality not currently supported by your browser. If possible, please use a different browser to access this feature or <a href="http://browsehappy.com/">upgrade to a newer browser</a>.</p>
@@ -53,7 +53,7 @@ header("Access-Control-Allow-Origin: *");
 		<button type="submit">Track a flight →</button>
 	</form>
 
-	<a href="http://flightaware.com/"><img src="./FlightAwareMiseryMap_files/logo_blog.png" alt="FlightAware" id="logo"></a>
+	<a href="http://flightaware.com/"><img src="./staticfiles/logo_blog.png" alt="FlightAware" id="logo"></a>
 
 	<div id="topbar-branding">
 		<h1>MiseryMap</h1>
@@ -132,7 +132,7 @@ header("Access-Control-Allow-Origin: *");
 
 <div id="bottom">
 	<div id="timeline-loading">
-		<img src="./FlightAwareMiseryMap_files/loading.gif" alt="Loading historical data...">Loading historical data…
+		<img src="./staticfiles/loading.gif" alt="Loading historical data...">Loading historical data…
 	</div>
 
 	<svg id="timeline" preserveAspectRatio="none" viewBox="0 0 1100 90" style="display: block;">
@@ -185,14 +185,14 @@ header("Access-Control-Allow-Origin: *");
 var airports = {"KBOS":{"iata":"BOS","name":"Boston Logan Intl","coordinates":[-71.00642,42.36297]},"KJFK":{"iata":"JFK","name":"John F Kennedy Intl","terminal_area":"NYC","coordinates":[-73.77893,40.63975]},"KLGA":{"iata":"LGA","name":"LaGuardia","terminal_area":"NYC","coordinates":[-73.87261,40.77725]},"KEWR":{"iata":"EWR","name":"Newark Liberty Intl","terminal_area":"NYC","coordinates":[-74.16867,40.69250]},"KORD":{"iata":"ORD","name":"Chicago O'Hare Intl","terminal_area":"ORD","coordinates":[-87.90667,41.98165]},"KMDW":{"iata":"MDW","name":"Chicago Midway Intl","terminal_area":"ORD","coordinates":[-87.75242,41.78597]},"KATL":{"iata":"ATL","name":"Hartsfield-Jackson Intl","coordinates":[-84.42786,33.63670]},"KDEN":{"iata":"DEN","name":"Denver Intl","coordinates":[-104.67317,39.86167]},"KLAX":{"iata":"LAX","name":"Los Angeles Intl","terminal_area":"LAX","coordinates":[-118.40807,33.94250]},"KSNA":{"iata":"SNA","name":"John Wayne Arpt","terminal_area":"LAX","coordinates":[-117.86822,33.67567]},"KLGB":{"iata":"LGB","name":"Daugherty Field","terminal_area":"LAX","coordinates":[-118.15173,33.81775]},"KBUR":{"iata":"BUR","name":"Bob Hope","terminal_area":"LAX","coordinates":[-118.35867,34.20067]},"KONT":{"iata":"ONT","name":"Ontario Intl","terminal_area":"LAX","coordinates":[-117.60119,34.05600]},"KSFO":{"iata":"SFO","name":"San Francisco Intl","terminal_area":"SFO","coordinates":[-122.37524,37.61910]},"KOAK":{"iata":"OAK","name":"Metropolitan Oakland Intl","terminal_area":"SFO","coordinates":[-122.22072,37.72131]},"KSJC":{"iata":"SJC","name":"San Jose Int'l","terminal_area":"SFO","coordinates":[-121.92911,37.36267]},"KSEA":{"iata":"SEA","name":"Seattle-Tacoma Intl","coordinates":[-122.31178,47.44989]},"KIAH":{"iata":"IAH","name":"Houston Bush Int'ctl","terminal_area":"IAH","coordinates":[-95.34144,29.98444]},"KHOU":{"iata":"HOU","name":"William P Hobby","terminal_area":"IAH","coordinates":[-95.27889,29.64542]},"KMIA":{"iata":"MIA","name":"Miami Intl","terminal_area":"MIA","coordinates":[-80.29011,25.79536]},"KFLL":{"iata":"FLL","name":"Hollywood Int'l","terminal_area":"MIA","coordinates":[-80.15274,26.07260]},"KIAD":{"iata":"IAD","name":"Washington Dulles Intl","terminal_area":"DC","coordinates":[-77.45994,38.94744]},"KDCA":{"iata":"DCA","name":"Reagan National","terminal_area":"DC","coordinates":[-77.03770,38.85192]},"KBWI":{"iata":"BWI","name":"Baltimore/Washington Intl","terminal_area":"DC","coordinates":[-76.66833,39.17536]},"KDAL":{"iata":"DAL","name":"Dallas Love Field","terminal_area":"DAL","coordinates":[-96.85178,32.84711]},"KDFW":{"iata":"DFW","name":"Dallas/Fort Worth Intl","terminal_area":"DAL","coordinates":[-97.03800,32.89683]},"KCLT":{"iata":"CLT","name":"Charlotte/Douglas Intl","coordinates":[-80.94907,35.21374]},"KSLC":{"iata":"SLC","name":"Salt Lake City Intl","coordinates":[-111.97777,40.78839]},"KMSP":{"iata":"MSP","name":"Minneapolis/St Paul Intl","coordinates":[-93.22178,44.88197]},"KDTW":{"iata":"DTW","name":"Detroit Metro Wayne Co","coordinates":[-83.35339,42.21242]},"KPHX":{"iata":"PHX","name":"Phoenix Sky Harbor Intl","coordinates":[-112.01158,33.43428]}};
 </script>
 
-<script type="text/javascript" src="./FlightAwareMiseryMap_files/9fa865d7f-miserymap.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="./staticfiles/9fa865d7f-miserymap.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="http://e1.flightcdn.com/ajax/ignoreuser/airlines_js.rvt?locale=en_US&amp;country=US"></script>
-<!-- <script type="text/javascript" src="./FlightAwareMiseryMap_files/airlines_js.rvt"></script> -->
+<!-- <script type="text/javascript" src="./staticfiles/airlines_js.rvt"></script> -->
 
 
 <!-- All this crap needs to be included to support the jQuery UI autocomplete...
 	TODO: Find a lighter autocomplete implementation. -->
-<script type="text/javascript" src="./FlightAwareMiseryMap_files/4d646b1db-flightaware.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="./staticfiles/4d646b1db-flightaware.js" crossorigin="anonymous"></script>
 <script>
 $(function(){
 	$('#topbar-search input[name="airline"]').autocomplete({

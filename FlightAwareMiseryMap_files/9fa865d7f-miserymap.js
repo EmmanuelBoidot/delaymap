@@ -158,25 +158,42 @@ chart.append("line")
 window.onresize = resize_bar_chart;
 
 var loading_in_progress = 0;
-
-var data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
+var use_merged_data = 1;
 var use_saved_data = 0;
+if ( use_saved_data === 1 ) {
+	data_file = "./data/historical.rvt";
+	d3.select(this.firstChild).attr('class','slider-button on')
+} else {
+	var data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
+}
 load_data(data_file);
 
 d3.select('#data_choser')
 	.on('click', function(d) {
-		console.log("button clicked")
 	    if ( use_saved_data === 1 ) {
 	        use_saved_data = 0;
 	        data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
 	        d3.select(this.firstChild).attr('class','slider-button');
 	    } else {
 	    	use_saved_data = 1;
+	    	data_file = "./data/historical.rvt";
 	    	d3.select(this.firstChild).attr('class','slider-button on')
-	        data_file = "./data/historical.rvt";
 	    }   
 	    load_data(data_file);
 	});
+
+d3.select('#merge_choser')
+	.on('click', function(d) {
+	    if ( use_merged_data === 1 ) {
+	        use_merged_data = 0;
+	        d3.select(this.firstChild).attr('class','slider-button on');
+	    } else {
+	    	use_merged_data = 1;
+	    	d3.select(this.firstChild).attr('class','slider-button')
+	    }   
+	    load_data(data_file);
+	});
+
 
 function load_data(file_str){
 	// TODO : We should be doing the two ajax calls parallel, but we need a way to guarantee the first one finished before the second one
@@ -215,22 +232,29 @@ function load_data(file_str){
 			// console.log(historical_data[loaded_time_slice].time);
 			join_airports_to_data(historical_data[loaded_time_slice].data);
 			// console.log(data.data);
-			merged_data = merge_data(historical_data[loaded_time_slice].data);
+			if (use_merged_data === 1)
+				merged_data = merge_data(historical_data[loaded_time_slice].data);
+			else
+				merged_data = historical_data[loaded_time_slice].data;
 
 			// Remove previous graphical elements
-			map.select("g#pies").selectAll("g").remove();
-			map.select("g#bars").selectAll("g").remove();
+			map.selectAll("g#pies > g").remove();
+			map.selectAll("g#pies > path").remove();
+			map.selectAll("g#pies > text").remove();
+			map.selectAll("g#pies > circle").remove();
+			map.selectAll("g#bars > g").remove();
+			map.selectAll("g#tracks > path").remove();
+			map.selectAll("#map-mask-airport > circle").remove();
 			timeline.select("g#x-axis").remove();
-			timeline.select("g#timeline-graph").selectAll("path").remove();
-			timeline.select("g#timeline-marker").selectAll("path").remove();
-			timeline.select("g#timeline-hovermarker").selectAll("path").remove();
+			timeline.selectAll("g#timeline-graph > path").remove();
+			timeline.selectAll("g#timeline-marker > path").remove();
+			timeline.selectAll("g#timeline-hovermarker > path").remove();
 
 
 
 			var pies = map.select("g#pies").selectAll("g")
-				.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
-					return d.airport;}})
-				// .data(merged_data,key)
+				// .data(merged_data,function(d, i){if (typeof d !== 'undefined'){return d.airport;}})
+				.data(merged_data,key)
 				.enter().append("g")
 				.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
 				.attr("class", "pie");
@@ -259,9 +283,7 @@ function load_data(file_str){
 				.style("fill", "transparent");
 
 			map.select("#map-mask-airport").selectAll("circle")
-				.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
-					// console.log(merged_data[merged_data.indexOf(d)]);
-					return d.airport;}})
+				.data(merged_data,key)
 				.enter().append("circle")
 				.attr("r", 0)
 				.attr("cx", function(d) { return projection(d.coordinates)[0]; })
@@ -378,7 +400,7 @@ function load_data(file_str){
 
 
 function key(d) {
-	// console.log(d)
+	// if (typeof d !== 'undefined'){return d.airport;}
 	return d.airport;
 }
 
@@ -426,7 +448,11 @@ function redraw(data, time, merged_data) {
 	// The last argument is optional, if it wasn't passed, then we need to merge the data ourselves
 	if (typeof merged_data === "undefined") {
 		join_airports_to_data(data);
-		var merged_data = merge_data(data);
+		var merged_data;
+		if (use_merged_data === 1)
+			merged_data = merge_data(data);
+		else
+			merged_data = data;
 	}
 	// var mymergeddata = []
 	// for(var i = 0; i < merged_data.length; i++){
@@ -506,10 +532,9 @@ function redraw(data, time, merged_data) {
 		.transition()
 		.attr("y2", height);
 
-	var bars = chart.select("g#chart-content").selectAll("g.chart-bar") // should call key function
-		.data(filtered_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})//,function(d){if (typeof filtered_data[filtered_data.indexOf(d)] !== 'undefined'){
-			// console.log(filtered_data[filtered_data.indexOf(d)]);
-			// return filtered_data[filtered_data.indexOf(d)];}})
+	var bars = chart.select("g#chart-content").selectAll("g.chart-bar")
+		.data(filtered_data,key)
+		// .data(filtered_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
 	// console.log("REDRAW:\t bars");
 	// console.log(bars)
 
@@ -520,8 +545,8 @@ function redraw(data, time, merged_data) {
 		.enter().append("g")
 		.attr("class", "chart-bar")
 		.on("mouseenter", function(d) {
-			// console.log("REDRAW:\t bars.d")
-			// console.log(d);
+			// console.log("BAR ENTERED:\t airport")
+			// console.log(d.airport);
 			// thisbar = get_pie_from_bar(d);
 			// console.log(thisbar);
 			// for (var i=0;i<merged_data.length;i++) {console.log(merged_data[i].airport);}
@@ -607,21 +632,22 @@ function redraw(data, time, merged_data) {
 		.attr("class", "chart-bar-legendlabel");
 
 	var pies = map.select("g#pies").selectAll("g")
-		// .data(merged_data,key);
-		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
+		.data(merged_data,key);
+		// .data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
 
 	// console.log("REDRAW:\t pies");
 	// console.log(pies)
 
 	pies
 		.on("mouseenter", function(d) {
-			// console.log("PIES:\t mouseenter")
+			// console.log("PIE ENTERED:\t airport")
+			// console.log(d.airport);
 			highlightAirport(d3.select(this), merged_data);
 			drawTracks(d3.select(this), merged_data);
 			reset_popup_timer();
 		}).on("click", function(d) {
-			// console.log("PIES:\t click")
-			// alert("PIES:\t click");
+			// console.log("PIE CLICKED:")
+			// console.log(d.airport);
 			if (!selected_airport || selected_airport.datum() !== d) {
 				if (selected_airport)
 					removeSelection(selected_airport);
@@ -633,6 +659,9 @@ function redraw(data, time, merged_data) {
 				var titleHtml = "Delayed: " + d.delayed;
 				if (d.cancelled > 0) {
 					titleHtml += "</br>Cancelled: " + d.cancelled;
+				}
+				if (d.ontime > 0) {
+					titleHtml += "</br>OnTime: " + d.ontime;
 				}
 
 				var contentHtml = "";
@@ -677,7 +706,7 @@ function redraw(data, time, merged_data) {
 							 dests.length + d.airport.length);
 
 				// Make sure the link is correctly generated at first.
-				flight_finder_option_change(orig);
+				// flight_finder_option_change(orig);
 
 				// update_url(null, airport_code_from_datum(d));
 			} else {
@@ -722,9 +751,8 @@ function redraw(data, time, merged_data) {
 
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){
-			// console.log(filtered_data[filtered_data.indexOf(d)]);
-			return d.airport;}})
+		.data(merged_data,key)
+		// .data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
 		.transition()
 		.attr("r", function(d) { return outer_radius({data: d}) + 2; });
 
@@ -774,7 +802,8 @@ function drawTracks(element, data) {
 	var animate_tracks = map.select("g#tracks").selectAll("path")[0].length < 1;
 
 	var tracks = map.select("g#tracks").selectAll("path")
-		.data(data, function(d,i){if (typeof d !== 'undefined'){return d.airport; }});
+		.data(data,key);
+		// .data(data, function(d,i){if (typeof d !== 'undefined'){return d.airport; }});
 
 	tracks
 		.enter().append("path")
@@ -960,7 +989,8 @@ function highlightAirport(airport, data) {
 		});
 
 	map.select("#map-mask-airport").selectAll("circle")
-		.data(data, function(d,i){if(typeof d !== "undefined"){return d.airport;}})
+		// .data(data, function(d,i){if(typeof d !== "undefined"){return d.airport;}})
+		.data(data,key)
 		.transition()
 		.attr("r", function(d) {
 			radius = outer_radius({data: d}) + 2;

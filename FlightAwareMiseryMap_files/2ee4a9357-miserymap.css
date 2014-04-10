@@ -1901,3 +1901,7 @@ body .ui-tooltip {
   background: #006699;
 }
 
+.option_toggle_container {
+	margin:5px 0 5px 0;
+	padding:0px 5px 0px 5px;
+}

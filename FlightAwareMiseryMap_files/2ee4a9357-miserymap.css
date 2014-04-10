@@ -92,7 +92,7 @@ aside {
 	right: 0;
 	width: 25%;
 	height: 100%;
-	padding: 45px 20px 20px 20px;
+	padding: 10px 20px 20px 20px;
 	text-align: center;
 	border-left: 1px solid #00A0E2;
 	background: #FFF;
@@ -1855,5 +1855,49 @@ body .ui-tooltip {
 .ui-slider .ui-slider-handle { z-index: 1; } 
 .ui-autocomplete-loading {
     background: #FFF url("http://e1.flightcdn.com/images/loading.gif") no-repeat right center;
+}
+
+/* eboidot adds-on */
+.slider-frame {
+  position: relative;
+  display: block;
+  margin: 0 auto;
+  width: 25%;
+  height: 27px;
+  background-color: rgb(246, 249, 251);
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
+}
+.slider-button {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 51%;
+  height: 27px;
+  line-height: 27px;
+  background: #006699;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
+  color: #000;
+  font-family:sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  text-align: center;
+  cursor: pointer;
+  -webkit-box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
+}
+.slider-button.on {
+	position: absolute;
+	left: 0px;
+  /*margin-left: 40px;*/
+  background: #006699;
 }
 

@@ -94,7 +94,11 @@ header("Access-Control-Allow-Origin: *");
 			<div id="ad-topshadow"></div>
 			<div id="ad-content">
 				<p>Choose which data you want to display.</p>
-				<span id="saved_data">Saved data</span><button id="data_choser"> . </button><span id="current_data">Current traffic data</span>
+				<div style="padding:0 5px 0 5px;">
+					<span id="saved_data" style="position:absolute;left:15px;">Saved</span>
+					<span id="current_data" style="position:absolute;right:15px;">Last 48h</span>
+					<span class="slider-frame" id="data_choser"><span class="slider-button"></span></span>
+				</div>
 			</div>
 			
 		</div>

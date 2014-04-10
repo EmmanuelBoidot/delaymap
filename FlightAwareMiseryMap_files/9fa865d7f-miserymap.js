@@ -150,6 +150,7 @@ chart.append("line")
 window.onresize = resize_bar_chart;
 
 var loading_in_progress = 0;
+var pause_req;
 // var mydata = []
 // var mymergeddata = []
 // var myfiltereddata = [];
@@ -157,8 +158,8 @@ var loading_in_progress = 0;
 var data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
 var use_saved_data = 0;
 load_data(data_file);
-d3.select('#saved_data').style("font-weight", "normal");
-d3.select('#current_data').style("font-weight", "bold");
+// d3.select('#saved_data').style("font-weight", "normal");
+// d3.select('#current_data').style("font-weight", "bold");
 // interval = setInterval(advanceMap, play_speed);
 
 d3.select('#data_choser')
@@ -170,16 +171,19 @@ d3.select('#data_choser')
 	    if ( use_saved_data === 1 ) {
 	        use_saved_data = 0;
 	        data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
-	        d3.select('#saved_data').style("font-weight", "normal");
-			d3.select('#current_data').style("font-weight", "bold");
+	        d3.select(this.firstChild).attr('class','slider-button')
+	  //       d3.select('#saved_data').style("font-weight", "normal");
+			// d3.select('#current_data').style("font-weight", "bold");
 	    } else {
 	    	use_saved_data = 1;
+	    	d3.select(this.firstChild).attr('class','slider-button on')
 	        data_file = "./FlightAwareMiseryMap_files/historical.rvt";
-	        d3.select('#saved_data').style("font-weight", "bold");
-			d3.select('#current_data').style("font-weight", "normal");
+	  //       d3.select('#saved_data').style("font-weight", "bold");
+			// d3.select('#current_data').style("font-weight", "normal");
 	    }   
 	    load_data(data_file);
 	    // interval = setInterval(advanceMap, play_speed);
+	    // pause_req = null;
 	});
 
 
@@ -325,12 +329,13 @@ function load_data(file_str){
 			// data = mydata;
 			historical_data = historical_data.concat(data);
 			console.log(historical_data);
+			loaded_time_slice = 0;
 
-			current_time = new Date(historical_data[0].time * 1000);
-			console.log(historical_data[0].time);
-			join_airports_to_data(historical_data[0].data);
+			current_time = new Date(historical_data[loaded_time_slice].time * 1000);
+			console.log(historical_data[loaded_time_slice].time);
+			join_airports_to_data(historical_data[loaded_time_slice].data);
 			// console.log(data.data);
-			merged_data = merge_data(historical_data[0].data);
+			merged_data = merge_data(historical_data[loaded_time_slice].data);
 
 			// Remove previous graphical elements
 			map.select("g#pies").selectAll("g").remove();
@@ -485,7 +490,7 @@ function load_data(file_str){
 				redraw(closest_slice.data, closest_slice.time);
 			}
 
-			redraw(historical_data[0].data, historical_data[0].time,merged_data);
+			redraw(historical_data[loaded_time_slice].data, historical_data[loaded_time_slice].time,merged_data);
 		});
 	}
 	loading_in_progress = 0;

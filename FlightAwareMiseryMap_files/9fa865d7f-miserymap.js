@@ -468,7 +468,7 @@ function load_data(file_str){
 
 				resize_bar_chart();
 
-				update_url(closest_slice.time.getTime() / 1000, null);
+				// update_url(closest_slice.time.getTime() / 1000, null);
 			}).on("mouseleave", function() {
 				hovermarker
 					.style("display", "none");
@@ -658,11 +658,11 @@ function redraw(data, time, merged_data) {
 
 				selected_airport = pie;
 				selectAirport(pie);
-				update_url(null, d.airport);
+				// update_url(null, d.airport);
 			} else {
 				selected_airport = null;
 				removeSelection(pie);
-				update_url(null, 'all');
+				// update_url(null, 'all');
 			}
 		}).on("mouseleave", function(d) {
 			if (!selected_airport) {
@@ -759,7 +759,7 @@ function redraw(data, time, merged_data) {
 				var contentHtml = "";
 
 				for (var i = 0; i < d.airport.length; ++i) {
-					contentHtml += "<a href=\"/live/airport/" + d.airport[i] + "\" target=\"_blank\" style=\"color: #3498db;\">" + d.airport[i] + "</a>";
+					contentHtml += "<a href=\""+hostname+"/live/airport/" + d.airport[i] + "\" target=\"_blank\" style=\"color: #3498db;\">" + d.airport[i] + "</a>";
 
 					if (i < d.airport.length - 1) {
 						contentHtml += "</br>";
@@ -789,7 +789,7 @@ function redraw(data, time, merged_data) {
 					}
 
 					contentHtml += "</select>";
-					contentHtml += "</br><a id=\"flight_finder_link\" href=\"/live/findflight/\" target=\"_blank\" style=\"color: #3498db\">View Flight Finder for Route</a>"
+					contentHtml += "</br><a id=\"flight_finder_link\" href=\""+ hostname +"/live/findflight/\" target=\"_blank\" style=\"color: #3498db\">View Flight Finder for Route</a>"
 				}
 
 				invoke_popup(d3.event,
@@ -800,12 +800,12 @@ function redraw(data, time, merged_data) {
 				// Make sure the link is correctly generated at first.
 				flight_finder_option_change(orig);
 
-				update_url(null, airport_code_from_datum(d));
+				// update_url(null, airport_code_from_datum(d));
 			} else {
 				selected_airport = null;
 				removeSelection(d3.select(this));
 				fade_out_popup();
-				update_url(null, 'all');
+				// update_url(null, 'all');
 			}
 		}).on("mouseleave", function(d) {
 			if (!selected_airport) {
@@ -975,7 +975,7 @@ function advanceMap() {
 
 	redraw(next_slice.data, next_slice.time);
 
-	update_url(next_slice.time.getTime() / 1000, null);
+	// update_url(next_slice.time.getTime() / 1000, null);
 }
 
 function drawTimelineMarker(time) {
@@ -1335,7 +1335,7 @@ function airport_code_from_datum(datum) {
 
 function flight_finder_option_change(orig) {
 	var dest = document.getElementById("flight_finder_options").value;
-	document.getElementById("flight_finder_link").href = "/live/findflight/" + orig + "/" + dest;
+	document.getElementById("flight_finder_link").href = hostname+"/live/findflight/" + orig + "/" + dest;
 	reset_popup_timer();
 }
 

@@ -146,6 +146,14 @@ chart.append("line")
 	.attr("y1", 0)
 	.attr("class", "chart-axis");
 
+// d3.select("#sidebar-fullcancellink").on("keydown", function(e){
+// 	console.log("coucou cest moi")
+// 	var code = e.keyCode || e.which;
+// 	 if(code == 32) { //Enter keycode
+// 	 	advanceMap();
+// 	 }
+// });	
+
 
 window.onresize = resize_bar_chart;
 

@@ -581,7 +581,7 @@ div#pop-up {
 	opacity: 0;
 	position: absolute;
 	color: white;
-	font-size: 14px;
+	font-size: 10px;
 	background: rgba(0,0,0,0.7);
 	padding: 5px 10px 5px 10px;
 	-moz-border-radius: 5px 5px;
@@ -590,14 +590,14 @@ div#pop-up {
 }
 
 div#pop-up-title {
-	font-size: 15px;
-	width: 150px;
+	font-size: 11px;
+	width: 100%;
 	margin-bottom: 4px;
 	font-weight: bolder;
 }
 
 div#pop-up-content {
-	font-size: 14px;
+	font-size: 10px;
 }
 
 /*

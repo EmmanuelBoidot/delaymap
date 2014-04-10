@@ -150,153 +150,25 @@ chart.append("line")
 window.onresize = resize_bar_chart;
 
 var loading_in_progress = 0;
-var pause_req;
-// var mydata = []
-// var mymergeddata = []
-// var myfiltereddata = [];
 
 var data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
 var use_saved_data = 0;
 load_data(data_file);
-// d3.select('#saved_data').style("font-weight", "normal");
-// d3.select('#current_data').style("font-weight", "bold");
-// interval = setInterval(advanceMap, play_speed);
 
 d3.select('#data_choser')
-	// .append("circle")
-	// .attr("r", 5)
-	// .style("fill", "black")
 	.on('click', function(d) {
 		console.log("button clicked")
 	    if ( use_saved_data === 1 ) {
 	        use_saved_data = 0;
 	        data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
-	        d3.select(this.firstChild).attr('class','slider-button')
-	  //       d3.select('#saved_data').style("font-weight", "normal");
-			// d3.select('#current_data').style("font-weight", "bold");
+	        d3.select(this.firstChild).attr('class','slider-button');
 	    } else {
 	    	use_saved_data = 1;
 	    	d3.select(this.firstChild).attr('class','slider-button on')
-	        data_file = "./FlightAwareMiseryMap_files/historical.rvt";
-	  //       d3.select('#saved_data').style("font-weight", "bold");
-			// d3.select('#current_data').style("font-weight", "normal");
+	        data_file = "./data/historical.rvt";
 	    }   
 	    load_data(data_file);
-	    // interval = setInterval(advanceMap, play_speed);
-	    // pause_req = null;
 	});
-
-
-
-// Map vector data is hardcoded in the HTML, use this to generate it from the GeoJSON source file
-// d3.json("/ajax/ignoreuser/miserymap/us.json", function(error, data) {
-// 	var path = d3.geo.path()
-// 		.projection(projection);
-
-// 	map.select("g#map-bg")
-// 		.selectAll("path")
-// 		.data(data.features)
-// 		.enter().append("path")
-// 		.attr("d", path)
-// 		.attr("fill", "#DEDEDE")
-// 		.attr("stroke", "#FFFFFF")
-// 		.attr("stroke-width", 0.5);
-// });
-
-// d3.json("./FlightAwareMiseryMap_files/realtime.rvt", function (error, data) {
-// // d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/realtime.rvt", function (error, data) {
-// 	// mydata = []
-// 	// for(var i = 0; i < data.data.length; i++){
-// 	// 	// console.log(data.data[i].airport)
-// 	//     var item = {airport: 			data.data[i].airport, 
-// 	// 		    	cancelled: 			data.data[i].cancelled,
-// 	// 		    	coordinates: 		data.data[i].coordinates,
-// 	// 				delayed: 			data.data[i].delayed,
-// 	// 				destinations: 		data.data[i].destinations,
-// 	// 				iata: 				data.data[i].iata,
-// 	// 				name: 				data.data[i].name,
-// 	// 				ontime: 			data.data[i].ontime,
-// 	// 				terminal_area: 		data.data[i].terminal_area};
-// 	//     mydata.push(item);
-// 	// }	
-// 	// data = {time:data.time, data:mydata};
-// 	historical_data.push(data);
-// 	current_time = new Date(data.time * 1000);
-// 	// console.log(historical_data)
-// 	// console.log(current_time)
-
-// 	join_airports_to_data(data.data);
-// 	// console.log(data.data);
-// 	merged_data = merge_data(data.data);
-// 	// console.log("MAIN:\t merged_data");
-// 	// console.log(merged_data);
-// 	// var mymergeddata = []
-// 	// for(var i = 0; i < merged_data.length; i++){
-// 	// 	// console.log(merged_data[i].airport)
-// 	//     var item = {airport: 			merged_data[i].airport, 
-// 	// 		    	cancelled: 			merged_data[i].cancelled,
-// 	// 		    	coordinates: 		merged_data[i].coordinates,
-// 	// 				delayed: 			merged_data[i].delayed,
-// 	// 				destinations: 		merged_data[i].destinations,
-// 	// 				iata: 				merged_data[i].iata,
-// 	// 				name: 				merged_data[i].name,
-// 	// 				ontime: 			merged_data[i].ontime,
-// 	// 				terminal_area: 		merged_data[i].terminal_area};
-// 	//     mymergeddata.push(item);
-// 	// }
-// 	// merged_data = mymergeddata;
-// 	// console.log("MAIN:\t mymergeddata");
-// 	// console.log(mymergeddata);
-
-// 	// Draw pie charts
-// 	// console.log(merged_data)
-// 	// var my_airports = map.select("g#pies").selectAll("g")
-// 	// console.log(my_airports)
-// 	// my_airports = my_airports.data(merged_data, key);
-// 	// console.log(my_airports)
-// 	var pies = map.select("g#pies").selectAll("g")
-// 		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
-// 			return d.airport;}})
-// 		// .data(merged_data,key)
-// 		.enter().append("g")
-// 		.attr("transform", function (d) { return "translate(" + projection(d.coordinates)[0] + "," + projection(d.coordinates)[1] + ")"; })
-// 		.attr("class", "pie");
-// 	// console.log("MAIN:\t pies")
-// 	// console.log(pies);
-
-// 	pies.selectAll("path")
-// 		.data(function(d, i) { return pie([d, d], i); })
-// 		.enter().append("path")
-// 		.each(function(d) { this._current = d; }); // store the initial values for animation tweening
-// 	console.log(pies.selectAll("path"));
-
-// 	pies.selectAll("text")
-// 		.data(function(d) { return [d]; })
-// 		.enter().append("text")
-// 		.text(function(d) { return ("terminal_area" in d ? d.terminal_area : d.iata); })
-// 		.attr("dy", ".35em")
-// 		.attr("text-anchor", "middle");
-
-// 	// Add transparent circle to make it easier for users to select airports
-// 	pies.selectAll("circle")
-// 		.data(function(d) { return [d]; })
-// 		.enter().append("circle")
-// 		.attr("cx", 0)
-// 		.attr("cy", 0)
-// 		.style("stroke", "none")
-// 		.style("fill", "transparent");
-
-// 	map.select("#map-mask-airport").selectAll("circle")
-// 		.data(merged_data,function(d, i){if (typeof d !== 'undefined'){
-// 			// console.log(merged_data[merged_data.indexOf(d)]);
-// 			return d.airport;}})
-// 		.enter().append("circle")
-// 		.attr("r", 0)
-// 		.attr("cx", function(d) { return projection(d.coordinates)[0]; })
-// 		.attr("cy", function(d) { return projection(d.coordinates)[1]; })
-// 		.style("fill", "black");
-
-// 	redraw(data.data, current_time, merged_data);
 
 function load_data(file_str){
 	// TODO : We should be doing the two ajax calls parallel, but we need a way to guarantee the first one finished before the second one
@@ -328,11 +200,11 @@ function load_data(file_str){
 			// }
 			// data = mydata;
 			historical_data = historical_data.concat(data);
-			console.log(historical_data);
+			// console.log(historical_data);
 			loaded_time_slice = 0;
 
 			current_time = new Date(historical_data[loaded_time_slice].time * 1000);
-			console.log(historical_data[loaded_time_slice].time);
+			// console.log(historical_data[loaded_time_slice].time);
 			join_airports_to_data(historical_data[loaded_time_slice].data);
 			// console.log(data.data);
 			merged_data = merge_data(historical_data[loaded_time_slice].data);
@@ -361,7 +233,6 @@ function load_data(file_str){
 				.data(function(d, i) { return pie([d, d], i); })
 				.enter().append("path")
 				.each(function(d) { this._current = d; }); // store the initial values for animation tweening
-			console.log(pies.selectAll("path"));
 
 			pies.selectAll("text")
 				.data(function(d) { return [d]; })
@@ -565,10 +436,10 @@ function redraw(data, time, merged_data) {
 	// }
 	// merged_data = mymergeddata;
 	// console.log(merged_data);
-	console.log("REDRAW:\t merged_data")
-	console.log(merged_data);
-	console.log("REDRAW:\t data")
-	console.log(data);
+	// console.log("REDRAW:\t merged_data")
+	// console.log(merged_data);
+	// console.log("REDRAW:\t data")
+	// console.log(data);
 	// data = merged_data;
 
 	d3.selectAll("#count-delays-value, #count-cancellations-value")
@@ -600,7 +471,7 @@ function redraw(data, time, merged_data) {
 	// var filtered_data = data.filter(function(d) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort).slice(0, 20);
 	filtered_data = data.filter(function(d,i) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort);
 	// console.log(data);
-	console.log(filtered_data);
+	// console.log(filtered_data);
 	// console.log(filtered_data[0].airport)
 
 	// mydata = data;
@@ -731,8 +602,8 @@ function redraw(data, time, merged_data) {
 		// .data(merged_data,key);
 		.data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
 
-	console.log("REDRAW:\t pies");
-	console.log(pies)
+	// console.log("REDRAW:\t pies");
+	// console.log(pies)
 
 	pies
 		.on("mouseenter", function(d) {
@@ -778,7 +649,7 @@ function redraw(data, time, merged_data) {
 				});
 
 				if (dests.length > 0) {
-					contentHtml += "<p style=\"font-size: 15px; font-weight: bolder;\">All flights to</br>major destinations:</p>";
+					contentHtml += "<p style=\"font-size: 10px; font-weight: bolder;\">All flights to</br>major destinations:</p>";
 					contentHtml += "<select id=\"flight_finder_options\" onchange=\"flight_finder_option_change('" + orig + "');\">";
 					
 					for (var j = 0; j < dests.length; ++j) {
@@ -819,9 +690,9 @@ function redraw(data, time, merged_data) {
 				drawTracks(selected_airport, merged_data);
 			}
 		});
-	console.log(map.selectAll("g#pies > g"))
-	console.log("REDRAW:\t pies");
-	console.log(pies)
+	// console.log(map.selectAll("g#pies > g"))
+	// console.log("REDRAW:\t pies");
+	// console.log(pies)
 
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
@@ -863,7 +734,7 @@ function redraw(data, time, merged_data) {
 		});
 	
 	if (typeof response_airport !== 'undefined' && loaded_response === false) {
-		console.log("REDRAW:\t endloop ----")
+		// console.log("REDRAW:\t endloop ----")
 		map.selectAll("g#pies > g").filter(function(e) { return e.airport.indexOf(response_airport) !== -1; })
 		   .each(function(d, i) {
 			    selected_airport = d3.select(this);
@@ -877,10 +748,10 @@ function redraw(data, time, merged_data) {
 
 function drawTracks(element, data) {
 	var airport = element.datum();
-	console.log("DRAWTRACKS:\t airport")
-	console.log(airport)
-	console.log("DRAWTRACKS:\t data")
-	console.log(data)	
+	// console.log("DRAWTRACKS:\t airport")
+	// console.log(airport)
+	// console.log("DRAWTRACKS:\t data")
+	// console.log(data)	
 
 	var diagonal = d3.svg.diagonal()
 		.source({x: projection(airport.coordinates)[0], y: projection(airport.coordinates)[1]})
@@ -900,13 +771,13 @@ function drawTracks(element, data) {
 	tracks
 		.enter().append("path")
 		.style("stroke", colors.ontime);
-	console.log("DRAWTRACKS:\t tracks")
-	console.log(map.select("g#tracks").selectAll("path"))
+	// console.log("DRAWTRACKS:\t tracks")
+	// console.log(map.select("g#tracks").selectAll("path"))
 
 	tracks
 		.exit().remove();
-	console.log("DRAWTRACKS:\t tracks")
-	console.log(map.select("g#tracks").selectAll("path"))
+	// console.log("DRAWTRACKS:\t tracks")
+	// console.log(map.select("g#tracks").selectAll("path"))
 
 	tracks
 		.on("click", function(d) {
@@ -1193,8 +1064,8 @@ function degrees_to_meters(input) {
 function merge_data(data) {
 	var result = [];
 
-	console.log("MERGEDATA:\t data");
-	console.log(data)
+	// console.log("MERGEDATA:\t data");
+	// console.log(data)
 	var already_merged = [];
 	for (var i = 0; i < data.length; i++) {
 		if (already_merged.indexOf(i) === -1) {
@@ -1208,8 +1079,8 @@ function merge_data(data) {
 			result.push(merged_airport);
 		}
 	}
-	console.log("MERGEDATA:\t merged_data");
-	console.log(result)
+	// console.log("MERGEDATA:\t merged_data");
+	// console.log(result)
 	// var test = result.map(function(d) {
 	// 	console.log(result[result.indexOf(d)]);
 	//     return {
@@ -1312,7 +1183,7 @@ function invoke_popup(e, titleHtml, contentHtml, numLines) {
 	var pt = e.pageY - 25;
 	
 	p.style('left', '20px')
-	 .style('top', '60%');
+	 .style('top', '65%');
 
 	d3.select('#pop-up-title').html(titleHtml);
 	d3.select('#pop-up-content').html(contentHtml);

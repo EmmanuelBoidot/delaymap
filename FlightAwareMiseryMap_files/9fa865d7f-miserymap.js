@@ -468,7 +468,7 @@ function load_data(file_str){
 
 				resize_bar_chart();
 
-				// update_url(closest_slice.time.getTime() / 1000, null);
+				update_url(closest_slice.time.getTime() / 1000, null);
 			}).on("mouseleave", function() {
 				hovermarker
 					.style("display", "none");
@@ -603,10 +603,10 @@ function redraw(data, time, merged_data) {
 	console.log(filtered_data);
 	// console.log(filtered_data[0].airport)
 
-	mydata = data;
-	mymergeddata=merged_data;
-	myfiltereddata = filtered_data;
-	mytime = time;
+	// mydata = data;
+	// mymergeddata=merged_data;
+	// myfiltereddata = filtered_data;
+	// mytime = time;
 	// data=mydata;merged_data=mymergeddata;filtered_data=myfiltereddata;time=mytime;
 
 	var height = filtered_data.length * 20;
@@ -631,8 +631,8 @@ function redraw(data, time, merged_data) {
 		.data(filtered_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})//,function(d){if (typeof filtered_data[filtered_data.indexOf(d)] !== 'undefined'){
 			// console.log(filtered_data[filtered_data.indexOf(d)]);
 			// return filtered_data[filtered_data.indexOf(d)];}})
-	console.log("REDRAW:\t bars");
-	console.log(bars)
+	// console.log("REDRAW:\t bars");
+	// console.log(bars)
 
 	bars
 		.exit().remove();
@@ -641,11 +641,11 @@ function redraw(data, time, merged_data) {
 		.enter().append("g")
 		.attr("class", "chart-bar")
 		.on("mouseenter", function(d) {
-			console.log("REDRAW:\t bars.d")
-			console.log(d);
-			thisbar = get_pie_from_bar(d);
-			console.log(thisbar);
-			for (var i=0;i<merged_data.length;i++) {console.log(merged_data[i].airport);}
+			// console.log("REDRAW:\t bars.d")
+			// console.log(d);
+			// thisbar = get_pie_from_bar(d);
+			// console.log(thisbar);
+			// for (var i=0;i<merged_data.length;i++) {console.log(merged_data[i].airport);}
 			highlightAirport(get_pie_from_bar(d), merged_data);
 			drawTracks(get_pie_from_bar(d), merged_data);
 		}).on("click", function(d) {
@@ -658,11 +658,11 @@ function redraw(data, time, merged_data) {
 
 				selected_airport = pie;
 				selectAirport(pie);
-				// update_url(null, d.airport);
+				update_url(null, d.airport);
 			} else {
 				selected_airport = null;
 				removeSelection(pie);
-				// update_url(null, 'all');
+				update_url(null, 'all');
 			}
 		}).on("mouseleave", function(d) {
 			if (!selected_airport) {
@@ -736,12 +736,13 @@ function redraw(data, time, merged_data) {
 
 	pies
 		.on("mouseenter", function(d) {
-			console.log("PIES:\t mouseenter")
+			// console.log("PIES:\t mouseenter")
 			highlightAirport(d3.select(this), merged_data);
 			drawTracks(d3.select(this), merged_data);
 			reset_popup_timer();
 		}).on("click", function(d) {
-			console.log("PIES:\t click")
+			// console.log("PIES:\t click")
+			// alert("PIES:\t click");
 			if (!selected_airport || selected_airport.datum() !== d) {
 				if (selected_airport)
 					removeSelection(selected_airport);
@@ -799,12 +800,12 @@ function redraw(data, time, merged_data) {
 				// Make sure the link is correctly generated at first.
 				flight_finder_option_change(orig);
 
-				// update_url(null, airport_code_from_datum(d));
+				update_url(null, airport_code_from_datum(d));
 			} else {
 				selected_airport = null;
 				removeSelection(d3.select(this));
 				fade_out_popup();
-				// update_url(null, 'all');
+				update_url(null, 'all');
 			}
 		}).on("mouseleave", function(d) {
 			if (!selected_airport) {
@@ -974,7 +975,7 @@ function advanceMap() {
 
 	redraw(next_slice.data, next_slice.time);
 
-	// update_url(next_slice.time.getTime() / 1000, null);
+	update_url(next_slice.time.getTime() / 1000, null);
 }
 
 function drawTimelineMarker(time) {
@@ -1310,8 +1311,8 @@ function invoke_popup(e, titleHtml, contentHtml, numLines) {
 	var pl = e.pageX + 50;
 	var pt = e.pageY - 25;
 	
-	p.style('left', pl.toString() + 'px')
-	 .style('top', pt.toString() + 'px');
+	p.style('left', '20px')
+	 .style('top', '60%');
 
 	d3.select('#pop-up-title').html(titleHtml);
 	d3.select('#pop-up-content').html(contentHtml);
@@ -1375,7 +1376,7 @@ function update_url(epoch, airport) {
 		t = response_time;
 	}
 
-	var url = '/FlightAwareMiseryMap.html/';
+	var url = '/index.html/';
 	if (a) {
 		url += a;
 	}

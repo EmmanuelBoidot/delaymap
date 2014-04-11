@@ -161,7 +161,7 @@ var loading_in_progress = 0;
 var use_merged_data = 1;
 var use_saved_data = 0;
 if ( use_saved_data === 1 ) {
-	data_file = "./data/historical.rvt";
+	data_file = "./stored_data/historical.rvt";
 	d3.select(this.firstChild).attr('class','slider-button on')
 } else {
 	var data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
@@ -176,7 +176,7 @@ d3.select('#data_choser')
 	        d3.select(this.firstChild).attr('class','slider-button');
 	    } else {
 	    	use_saved_data = 1;
-	    	data_file = "./data/historical.rvt";
+	    	data_file = "./stored_data/historical.rvt";
 	    	d3.select(this.firstChild).attr('class','slider-button on')
 	    }   
 	    load_data(data_file);
@@ -269,7 +269,7 @@ function load_data(file_str){
 			pies.selectAll("text")
 				.data(function(d) { return [d]; })
 				.enter().append("text")
-				.text(function(d) { return ("terminal_area" in d ? d.terminal_area : d.iata); })
+				.text(function(d) { if (use_merged_data){return ("terminal_area" in d ? d.terminal_area : d.iata);}else{return d.iata;} })
 				.attr("dy", ".35em")
 				.attr("text-anchor", "middle");
 

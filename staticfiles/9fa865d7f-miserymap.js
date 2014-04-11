@@ -157,14 +157,17 @@ chart.append("line")
 
 window.onresize = resize_bar_chart;
 
+var data_file;
 var loading_in_progress = 0;
 var use_merged_data = 1;
 var use_saved_data = 0;
 if ( use_saved_data === 1 ) {
 	data_file = "./data/historical.rvt";
 	d3.select(this.firstChild).attr('class','slider-button on')
+	d3.select("#date_selector").attr('class','option_toggle_container');
 } else {
-	var data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
+	data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
+	d3.select("#date_selector").attr('class','option_toggle_container hidden');
 }
 load_data(data_file);
 
@@ -174,10 +177,12 @@ d3.select('#data_choser')
 	        use_saved_data = 0;
 	        data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
 	        d3.select(this.firstChild).attr('class','slider-button');
+	        d3.select("#date_selector").attr('class','option_toggle_container hidden');
 	    } else {
 	    	use_saved_data = 1;
 	    	data_file = "./data/historical.rvt";
-	    	d3.select(this.firstChild).attr('class','slider-button on')
+	    	d3.select(this.firstChild).attr('class','slider-button on');
+	    	d3.select("#date_selector").attr('class','option_toggle_container')
 	    }   
 	    load_data(data_file);
 	});
@@ -194,6 +199,16 @@ d3.select('#merge_choser')
 	    load_data(data_file);
 	});
 
+d3.select('#date_choser')
+	.on('click', function(d) {
+		console.log('coucou')
+		data_file = './dynamicdata?date='+d3.select('#datepicker').attr('value');  
+	    load_data(data_file);
+	});
+
+// d3.select("#datepicker")
+// 	.on('click', datepicker());
+
 
 function load_data(file_str){
 	// TODO : We should be doing the two ajax calls parallel, but we need a way to guarantee the first one finished before the second one
@@ -202,7 +217,7 @@ function load_data(file_str){
 		d3.select("#timeline-loading").style("display", "null");
 
 		d3.json(file_str, function (error, data) {
-			historical_data = []
+			historical_data = [];
 		// d3.json("http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt", function (error, data) {
 			// console.log(data);
 			// var mydata = []
@@ -229,6 +244,8 @@ function load_data(file_str){
 			loaded_time_slice = 0;
 
 			current_time = new Date(historical_data[loaded_time_slice].time * 1000);
+			d3.select("#datepicker").attr('value',current_time.getFullYear()+'-'+current_time.getMonth()+'-'+current_time.getDate())
+
 			// console.log(historical_data[loaded_time_slice].time);
 			join_airports_to_data(historical_data[loaded_time_slice].data);
 			// console.log(data.data);

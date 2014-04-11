@@ -95,14 +95,23 @@ header("Access-Control-Allow-Origin: *");
 			<div id="ad-topshadow"></div>
 			<div id="ad-content">
 				<p>Choose which data you want to display.</p>
-				<div style="padding:0 5px 0 5px;">
-					<span id="saved_data" style="position:absolute;left:15px;">Saved</span>
-					<span id="current_data" style="position:absolute;right:15px;">Last 48h</span>
+				<div class="option_toggle_container">
+					<span id="saved_data" style="position:absolute;left:10%;">Saved</span>
+					<span id="current_data" style="position:absolute;right:10%">Last 48h</span>
 					<span class="slider-frame" id="data_choser"><span class="slider-button"></span></span>
 				</div>
+				<div id="date_selector" class="option_toggle_container">
+					<span style="position:absolute;left:20%">
+						<!-- <span id="year_selector">xxxx</span>
+						<span id="month_selector">xx</span>
+						<span id="day_selector">xx</span> -->
+						<input type="text" id="datepicker">
+					</span>
+					<span class="date-frame" id="date_choser"><span class="date-button">Update</span></span>
+				</div>
 				<div class="option_toggle_container">
-					<span id="use_unmerged_data" style="position:absolute;left:15px;">Unmerged</span>
-					<span id="use_merged_data" style="position:absolute;right:15px;">Merged</span>
+					<span id="use_unmerged_data" style="position:absolute;left:10%;">Unmerged</span>
+					<span id="use_merged_data" style="position:absolute;right:10%;">Merged</span>
 					<span class="slider-frame" id="merge_choser"><span class="slider-button"></span></span>
 				</div>
 			</div>

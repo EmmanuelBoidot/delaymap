@@ -161,6 +161,8 @@ var data_file;
 var loading_in_progress = 0;
 var use_merged_data = 1;
 var use_saved_data = 0;
+var previous_hist = '';
+
 if ( use_saved_data === 1 ) {
 	data_file = "./data/historical.rvt";
 	d3.select(this.firstChild).attr('class','slider-button on')
@@ -180,7 +182,10 @@ d3.select('#data_choser')
 	        d3.select("#date-button").attr('class','date-button hidden');
 	    } else {
 	    	use_saved_data = 1;
-	    	data_file = "./data/historical.rvt";
+	    	if (previous_hist==='')
+		    	data_file = "./data/historical.rvt";
+		    else
+		    	data_file = './dynamicdata?date='+previous_hist;
 	    	d3.select(this.firstChild).attr('class','slider-button on');
 	    	d3.select("#date-button").attr('class','date-button')
 	    }   
@@ -201,7 +206,10 @@ d3.select('#merge_choser')
 
 d3.select('#date_choser')
 	.on('click', function(d) {
-		data_file = './dynamicdata?date='+d3.select('#datepicker').attr('value');  
+		previous_hist = d3.select('#datepicker').property('value'); 
+		data_file = './dynamicdata?date='+previous_hist;
+		d3.select('span#data_choser').select('span').attr('class','slider-button on');
+		use_saved_data = 1; 
 	    load_data(data_file);
 	});
 
@@ -246,7 +254,7 @@ function load_data(file_str){
 			loaded_time_slice = 0;
 
 			current_time = new Date(historical_data[loaded_time_slice].time * 1000);
-			d3.select("#datepicker").attr('value',current_time.getFullYear()+'-'+(current_time.getMonth()+1)+'-'+current_time.getDate())
+			d3.select("#datepicker").property('value',current_time.getFullYear()+'-'+(current_time.getMonth()+1)+'-'+current_time.getDate())
 			// console.log(current_time.getFullYear()+'-'+(current_time.getMonth()+1)+'-'+current_time.getDate())
 			// console.log(historical_data[loaded_time_slice].time);
 			join_airports_to_data(historical_data[loaded_time_slice].data);
@@ -413,7 +421,9 @@ function load_data(file_str){
 			redraw(historical_data[loaded_time_slice].data, historical_data[loaded_time_slice].time,merged_data);
 		
 			} else {
-				alert("The data for this date is not available");
+				alert("The data for the requested period is not available ('"+d3.select('#datepicker').property('value')+"''). Please use format year-month-day");
+				data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
+				d3.select(this.firstChild).attr('class','slider-button on');
 			}
 		});
 	}

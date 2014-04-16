@@ -86,9 +86,9 @@ header("Access-Control-Allow-Origin: *");
 
 	<div id="chart-container" style="width: 300px; height: 367px; overflow: scroll;">
 		<svg id="chart" style="width: 300px; height: 420px;" viewBox="0 0 300 400" preserveAspectRatio="xMidYMin meet">
-
-
-			
+	
+		</svg>
+		<svg id="fileblock" style="width: 300px; height: 420px;" viewBox="0 0 300 400" preserveAspectRatio="xMidYMin meet" class="hidden">
 		</svg>
 	</div>
 	<div id="ad">
@@ -102,12 +102,16 @@ header("Access-Control-Allow-Origin: *");
 				</div>
 				<div id="date_selector" class="option_toggle_container">
 					<span style="position:absolute;left:20%">
-						<!-- <span id="year_selector">xxxx</span>
-						<span id="month_selector">xx</span>
-						<span id="day_selector">xx</span> -->
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="text" id="datepicker" name="datepicker" value="ex: 2013-07-31">
 					</span>
 					<span class="date-frame" id="date_choser"><span id="date-button" class="date-button hidden">Update</span></span>
+				</div>
+				<div id="file_selector" class="option_toggle_container">
+					<span style="position:absolute;left:20%">
+						OR&nbsp;<input type="text" id="filepicker" name="filepicker" value="historical.rvt">
+					</span>
+					<span class="date-frame" id="file_choser"><span id="file-button" class="date-button hidden">Update</span></span>
 				</div>
 				<div class="option_toggle_container">
 					<span id="use_unmerged_data" style="position:absolute;left:10%;">Unmerged</span>

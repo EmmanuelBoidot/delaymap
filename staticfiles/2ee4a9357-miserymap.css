@@ -1944,3 +1944,6 @@ body .ui-tooltip {
 	-moz-box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
 	box-shadow: inset 0px 0px 4px 0 rgba(0, 0, 0, 0.25);
 }
+.fileblock-bar {
+	cursor: pointer;
+}

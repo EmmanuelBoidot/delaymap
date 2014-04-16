@@ -31,7 +31,8 @@ var timeline_width = 1100,
 
 var colors = {
 	delayed: "#ED1C24",
-	ontime: "#7AC143"
+	ontime: "#7AC143",
+	files: "#E6F4F8"
 };
 
 var hostname = "http://e1.flightcdn.com";
@@ -48,6 +49,10 @@ var map = d3.select("svg#map")
 var chart = d3.select("svg#chart");
 chart.append("g")
 	.attr("id", "chart-content");
+
+var fileblock = d3.select("svg#fileblock");
+fileblock.append("g")
+	.attr("id", "fileblock-content");
 
 var projection = d3.geo.mercator()
 	.scale(750)
@@ -145,6 +150,13 @@ chart.append("line")
 	.attr("x2", 30)
 	.attr("y1", 0)
 	.attr("class", "chart-axis");
+fileblock.append("line")
+	.attr("x1", 30)
+	.attr("x2", 30)
+	.attr("y1", 0)
+	.attr("class", "chart-axis");
+
+map.on('click', function(d){chart.attr('class','');});
 
 // d3.select("#sidebar-fullcancellink").on("keydown", function(e){
 // 	console.log("coucou cest moi")
@@ -213,6 +225,106 @@ d3.select('#date_choser')
 	    load_data(data_file);
 	});
 
+d3.select('#file_choser')
+	.on('click', function(d) {
+		rvt_name = d3.select('#filepicker').property('value'); 
+		data_file = './rvt?file='+rvt_name;
+		d3.select('span#data_choser').select('span').attr('class','slider-button on');
+		use_saved_data = 1; 
+	    load_data(data_file);
+	});
+
+var rvt_files = []
+d3.select('#filepicker')
+	.on('click', function(d) {
+		chart.attr('class','hidden')
+		fileblock.attr('class','')
+		rvt_files = []
+		rvt_names = []
+		var filebars = fileblock.select("g#fileblock-content").selectAll("g")
+		// filebars.remove();
+		d3.json('./rvt?file=all', function (error, data) {
+			for (var i = 0; i < data.length; i++){
+				rvt_files.push({name:data[i].name});
+				rvt_names.push(data[i].name);
+			}
+			// console.log(rvt_files)
+			// var filebars = fileblock.select("g#fileblock-content").selectAll("g")
+
+			// filebars
+				// .exit().remove();
+
+			filebars
+				.data(rvt_files)
+				.enter().append("g")
+				.attr("class", "fileblock-bar")
+				// .text(function(d) { return d.name; })
+
+			var x = d3.scale.linear()
+				.domain([0, 10])
+				.range([0, 270]);
+
+			var y = d3.scale.ordinal()
+				.domain(d3.range(rvt_files.length))
+				.rangeBands([0, (rvt_files.length)*20], 0.2);
+
+			filebars
+			// 	.transition()
+				.attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
+
+			var filerects = filebars.selectAll("rect")
+				.data(function(d) { return [10, 0, 10]; });
+			var filelegendlabels = filebars.selectAll("text.chart-bar-legendlabel")
+				.data(function(d) { return [d]; })
+
+			// the third rect is a transparent rectangle that is used to draw a stroke around the stacked bars on highlight
+			filerects
+				.enter().append("rect")
+				.style("fill", function(d, i) { return (i === 2 ? "none" : colors.files); })
+				.style("stroke", function(d, i) { return (i === 2 ? "black" : "white"); })
+				.style("display", function(d, i) { if (i === 2) return "none"; })
+				.style("stroke-width", function(d, i) { return (i === 2 ? 2 : 1); })
+				.attr("height", y.rangeBand());
+
+			filerects
+				.attr("x", 50)
+				.transition()
+				.attr("width", x);
+
+			filelegendlabels
+				.enter().append("text");
+
+			filelegendlabels
+				.transition()
+				.text(function(d) { return d.name; })
+				.attr("x", 30)
+				.attr("transform", "translate(240, 11)")
+				.style("text-anchor", "end")
+				.style("fill", "black")
+				.attr("class", "chart-bar-legendlabel");
+
+			filebars
+				.on("mouseenter", function(d) {
+					fileblock.selectAll("g#fileblock-content g")
+						.filter(function(d) { return rvt_names.indexOf(d.name) === -1; })
+						.style("opacity", 0.6);
+				}).on("click", function(d) {
+					console.log(d.name);
+					rvt_name = d.name;
+					d3.select('#filepicker').property('value',d.name); 
+					data_file = './rvt?file='+rvt_name;
+					d3.select('span#data_choser').select('span').attr('class','slider-button on');
+					use_saved_data = 1; 
+				    load_data(data_file);
+					chart.attr('class','')
+				}).on("mouseleave", function(d) {
+					fileblock.select("g#fileblock-content").selectAll("g")
+						.style("opacity", null);
+				});
+			});
+			// rvt_name = d3.select('#filepicker').property('value'); 
+	});
+
 // d3.select("#datepicker")
 // 	.on('click', datepicker());
 
@@ -259,7 +371,7 @@ function load_data(file_str){
 			// console.log(historical_data[loaded_time_slice].time);
 			join_airports_to_data(historical_data[loaded_time_slice].data);
 			// console.log(data.data);
-			if (use_merged_data === 1)
+			if (use_merged_data == 1)
 				merged_data = merge_data(historical_data[loaded_time_slice].data);
 			else
 				merged_data = historical_data[loaded_time_slice].data;
@@ -277,7 +389,24 @@ function load_data(file_str){
 			timeline.selectAll("g#timeline-marker > path").remove();
 			timeline.selectAll("g#timeline-hovermarker > path").remove();
 
+			rvt_files = []
+			var filebars = fileblock.select("g#fileblock-content").selectAll("g")
+			// filebars.remove();
+			d3.json('./rvt?file=all', function (error, data) {
+				for (var i = 0; i < data.length; i++){
+					rvt_files.push({name:data[i].name});
+				}
+				// console.log(rvt_files)
+				var filebars = fileblock.select("g#fileblock-content").selectAll("g")
 
+				filebars
+					.remove();
+
+				filebars
+					.data(rvt_files)
+					.enter().append("g")
+					.attr("class", "fileblock-bar")
+			});
 
 			var pies = map.select("g#pies").selectAll("g")
 				// .data(merged_data,function(d, i){if (typeof d !== 'undefined'){return d.airport;}})
@@ -388,7 +517,11 @@ function load_data(file_str){
 				// OK
 				drawTimelineMarker(closest_slice.time);
 
-				redraw(closest_slice.data, closest_slice.time);
+				// if (closest_slice.startime === "undefined"){
+					redraw(closest_slice.data, closest_slice.time);
+				// } else {
+					// redraw(closest_slice.data, closest_slice.time,null,closest_slice.startime,closest_slice.endtime);
+				// }
 				// console.log(closest_slice.time)
 				// console.log(closest_slice.data)
 
@@ -415,10 +548,18 @@ function load_data(file_str){
 				// console.log(new_time);
 				closest_slice = getClosestSliceFromTime(response_time);
 				drawTimelineMarker(closest_slice.time);
-				redraw(closest_slice.data, closest_slice.time);
+				// if (closest_slice.startime === "undefined"){
+					redraw(closest_slice.data, closest_slice.time);
+				// } else {
+					// redraw(closest_slice.data, closest_slice.time,null,closest_slice.startime,closest_slice.endtime);
+				// }
 			}
 
-			redraw(historical_data[loaded_time_slice].data, historical_data[loaded_time_slice].time,merged_data);
+			// if (historical_data[loaded_time_slice].startime === "undefined"){
+				redraw(historical_data[loaded_time_slice].data, historical_data[loaded_time_slice].time,merged_data);
+			// } else {
+				// redraw(historical_data[loaded_time_slice].data, historical_data[loaded_time_slice].time,merged_data,historical_data[loaded_time_slice].startime,historical_data[loaded_time_slice].endtime);
+			// }
 		
 			} else {
 				alert("The data for the requested period is not available ('"+d3.select('#datepicker').property('value')+"''). Please use format year-month-day");
@@ -477,7 +618,7 @@ function arcTween(a) {
 }
 
 
-function redraw(data, time, merged_data) {
+function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 	// The last argument is optional, if it wasn't passed, then we need to merge the data ourselves
 	if (typeof merged_data === "undefined") {
 		join_airports_to_data(data);
@@ -516,8 +657,16 @@ function redraw(data, time, merged_data) {
 
 
 	// 4 hours interval for statistics
-	var startime = d3.time.hour.offset(time, -2);
-	var stoptime = d3.time.hour.offset(time, 2);
+	if (typeof startime_raw === "undefined") {
+		var startime = d3.time.hour.offset(time, -2);
+	} else {
+		var startime = new Date(startime_raw * 1000);
+	}
+	if (typeof endtime_raw === "undefined") {
+		var stoptime = d3.time.hour.offset(time, 2);
+	} else {
+		var  stoptime =  new Date(endtime_raw * 1000);
+	}
 	var starttime_display = date_format(startime);
 	var stoptime_display = date_format(stoptime);
 
@@ -914,7 +1063,11 @@ function advanceMap() {
 
 	drawTimelineMarker(next_slice.time);
 
-	redraw(next_slice.data, next_slice.time);
+	// if (next_slice.startime === "undefined"){
+		redraw(next_slice.data, next_slice.time);
+	// } else {
+		// redraw(next_slice.data, next_slice.time,null,next_slice.startime,next_slice.endtime);
+	// }
 
 	// update_url(next_slice.time.getTime() / 1000, null);
 }
@@ -947,7 +1100,11 @@ d3.select("#timeline-controls").on("click", function(e) {
 		if (current_time.getTime() === Math.max.apply(Math, historical_data.map(function(d) { return d.time; }))) {
 			next_slice = historical_data.reduce(function(a,b) { return (a.time < b.time) ? a : b; });
 			drawTimelineMarker(next_slice.time);
-			redraw(next_slice.data, next_slice.time);
+			// if (next_slice.startime === "undefined"){
+				redraw(next_slice.data, next_slice.time);
+			// } else {
+				// redraw(next_slice.data, next_slice.time,null,next_slice.startime,next_slice.endtime);
+			// }
 			// console.log("end of timeline")
 		}
 

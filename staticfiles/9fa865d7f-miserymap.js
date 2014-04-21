@@ -167,7 +167,12 @@ map.on('click', function(d){chart.attr('class','');});
 // });	
 
 
-window.onresize = resize_bar_chart;
+window.onresize = resize_bar_choose;
+
+function resize_bar_choose(){
+	resize_bar_chart;
+	resize_filebar_chart
+}
 
 var data_file;
 var loading_in_progress = 0;
@@ -260,9 +265,13 @@ d3.select('#filepicker')
 				.attr("class", "fileblock-bar")
 				// .text(function(d) { return d.name; })
 
+			var height = rvt_files.length * 30;
+			d3.select("svg#fileblock").style("height", height.toString() + 'px');
+			resize_filebar_chart();
+
 			var x = d3.scale.linear()
 				.domain([0, 10])
-				.range([0, 270]);
+				.range([0,220]);
 
 			var y = d3.scale.ordinal()
 				.domain(d3.range(rvt_files.length))
@@ -287,7 +296,7 @@ d3.select('#filepicker')
 				.attr("height", y.rangeBand());
 
 			filerects
-				.attr("x", 50)
+				.attr("x", 10)
 				.transition()
 				.attr("width", x);
 
@@ -297,7 +306,7 @@ d3.select('#filepicker')
 			filelegendlabels
 				.transition()
 				.text(function(d) { return d.name; })
-				.attr("x", 30)
+				.attr("x", -20)
 				.attr("transform", "translate(240, 11)")
 				.style("text-anchor", "end")
 				.style("fill", "black")
@@ -678,8 +687,14 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 	if(startime_day != new Date(stoptime.getTime()).setHours(0,0,0,0))
 		stoptime_display = day_format(stoptime) + ", " + stoptime_display;
 
-	d3.selectAll("#starttime, #stoptime")
-		.data([starttime_display, stoptime_display])
+	if (use_saved_data==1){
+		utc_or_not_display = ' UTC'
+	} else {
+		utc_or_not_display = ''
+	}
+
+	d3.selectAll("#starttime, #stoptime, #utc_or_not")
+		.data([starttime_display, stoptime_display, utc_or_not_display])
 		.text(String);
 
 	var airport_sort = function(a,b) { return d3.descending(a.delayed + a.cancelled, b.delayed + b.cancelled); };
@@ -1450,6 +1465,17 @@ function resize_bar_chart() {
 
 	if (parseInt(d3.select("svg#chart").style("height"), 10) < (window.innerHeight - dy)) {
 		d3.select("svg#chart").style("height", (window.innerHeight - dy).toString() + 'px');
+	}
+}
+
+function resize_filebar_chart() {
+	var dy = parseInt(d3.select("svg#timeline").style("height"), 10) - 44 + // Approx. height of button
+		     87; // Height of delay/cancellation count text.
+
+	d3.select("#chart-container").style("height", (window.innerHeight - dy).toString() + 'px');
+
+	if (parseInt(d3.select("svg#fileblock").style("height"), 10) < (window.innerHeight - dy)) {
+		d3.select("svg#fileblock").style("height", (window.innerHeight - dy).toString() + 'px');
 	}
 }
 

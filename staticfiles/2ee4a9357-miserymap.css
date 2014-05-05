@@ -327,7 +327,7 @@ g#tracks {
 }
 .chart-bar-label {
 	text-anchor: end;
-	fill: white;
+	fill: black;
 }
 .chart-bar-legendlabel {
 	text-anchor: end;

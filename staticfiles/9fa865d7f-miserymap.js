@@ -31,6 +31,7 @@ var timeline_width = 1100,
 
 var colors = {
 	delayed: "#ED1C24",
+	cancelled: "#E6005C",
 	ontime: "#7AC143",
 	files: "#E6F4F8"
 };
@@ -259,6 +260,9 @@ d3.select('#filepicker')
 			// filebars
 				// .exit().remove();
 
+			var file_sort = function(a,b) { return d3.descending(a.name.localeCompare(b), b.name.localeCompare(a)); };
+			rvt_files = rvt_files.sort(file_sort);
+
 			filebars
 				.data(rvt_files)
 				.enter().append("g")
@@ -372,9 +376,14 @@ function load_data(file_str){
 			historical_data = historical_data.concat(data);
 
 			// console.log(historical_data);
-			loaded_time_slice = 0;
+			// if some something selected on timeline load the same
+			if (typeof loaded_time_slice === 'undefined'){
+				loaded_time_slice = 0;
+			}
 
 			current_time = new Date(historical_data[loaded_time_slice].time * 1000);
+			// console.log(historical_data[loaded_time_slice].time);
+			// console.log(current_time);
 			d3.select("#datepicker").property('value',current_time.getFullYear()+'-'+(current_time.getMonth()+1)+'-'+current_time.getDate())
 			// console.log(current_time.getFullYear()+'-'+(current_time.getMonth()+1)+'-'+current_time.getDate())
 			// console.log(historical_data[loaded_time_slice].time);
@@ -434,7 +443,7 @@ function load_data(file_str){
 			pies.selectAll("text")
 				.data(function(d) { return [d]; })
 				.enter().append("text")
-				.text(function(d) { if (use_merged_data){return ("terminal_area" in d ? d.terminal_area : d.iata);}else{return d.iata;} })
+				.text(function(d) { if (use_merged_data==1){return ("terminal_area" in d ? d.terminal_area : d.iata);} else {return d.iata;} })
 				.attr("dy", ".35em")
 				.attr("text-anchor", "middle");
 
@@ -522,6 +531,8 @@ function load_data(file_str){
 
 				// OK
 				closest_slice = getClosestSlice(d3.mouse(this)[0]);
+				loaded_time_slice = historical_data.indexOf(closest_slice);
+				// console.log(loaded_time_slice);
 
 				// OK
 				drawTimelineMarker(closest_slice.time);
@@ -534,7 +545,7 @@ function load_data(file_str){
 				// console.log(closest_slice.time)
 				// console.log(closest_slice.data)
 
-				fade_out_popup();
+				// fade_out_popup();
 
 				resize_bar_chart();
 
@@ -570,6 +581,7 @@ function load_data(file_str){
 				// redraw(historical_data[loaded_time_slice].data, historical_data[loaded_time_slice].time,merged_data,historical_data[loaded_time_slice].startime,historical_data[loaded_time_slice].endtime);
 			// }
 		
+			// if error OR typeof data[0] == 'undefined'
 			} else {
 				alert("The data for the requested period is not available ('"+d3.select('#datepicker').property('value')+"''). Please use format year-month-day");
 				data_file = "http://e1.flightcdn.com/ajax/ignoreuser/miserymap/historical.rvt";
@@ -611,8 +623,10 @@ function getClosestSlice(x_position) {
 
 var pie = d3.layout.pie()
 	.value(function(d, i) { return (i == 0 ? d.ontime : d.cancelled + d.delayed); });
-var outer_radius = function(d) { return 1.6 * Math.sqrt(d.data.ontime + d.data.delayed + d.data.cancelled); }
-var inner_radius = function(d) { return 0.8 * Math.sqrt(d.data.ontime + d.data.delayed + d.data.cancelled); }
+// var outer_radius = function(d) { return 1.6 * Math.sqrt(d.data.ontime + d.data.delayed + d.data.cancelled); }
+// var inner_radius = function(d) { return 0.8 * Math.sqrt(d.data.ontime + d.data.delayed + d.data.cancelled); }
+var outer_radius = function(d) { return 3.2 * Math.sqrt(d.data.delayed + d.data.cancelled); }
+var inner_radius = function(d) { return 1.6 * Math.sqrt(d.data.delayed + d.data.cancelled); }
 var arc = d3.svg.arc()
 	.outerRadius(outer_radius)
 	.innerRadius(inner_radius);
@@ -629,8 +643,8 @@ function arcTween(a) {
 
 function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 	// The last argument is optional, if it wasn't passed, then we need to merge the data ourselves
+	join_airports_to_data(data);
 	if (typeof merged_data === "undefined") {
-		join_airports_to_data(data);
 		var merged_data;
 		if (use_merged_data === 1)
 			merged_data = merge_data(data);
@@ -688,7 +702,7 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 		stoptime_display = day_format(stoptime) + ", " + stoptime_display;
 
 	if (use_saved_data==1){
-		utc_or_not_display = ' UTC'
+		utc_or_not_display = ' (your time)'
 	} else {
 		utc_or_not_display = ''
 	}
@@ -719,7 +733,7 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 	var x = d3.scale.linear()
 		// Round up the max to the nearest multiple of 10
 		.domain([0, Math.ceil(d3.max(filtered_data, function(d,i) { return d.delayed + d.cancelled; }) / 10) * 10])
-		.range([0, 270]);
+		.range([0, 260]);
 
 	var y = d3.scale.ordinal()
 		.domain(d3.range(filtered_data.length))
@@ -734,6 +748,8 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 		// .data(filtered_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
 	// console.log("REDRAW:\t bars");
 	// console.log(bars)
+	// console.log(filtered_data);
+	// console.log(merged_data);
 
 	bars
 		.exit().remove();
@@ -786,7 +802,7 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 	var rects = bars.selectAll("rect")
 		.data(function(d) { return [d.delayed + d.cancelled, d.delayed, d.delayed + d.cancelled]; });
 	var labels = bars.selectAll("text.chart-bar-label")
-		.data(function(d) { return [{offset: d.delayed + d.cancelled, value: d.cancelled}, {offset: d.delayed, value: d.delayed}]; })
+		.data(function(d) { return [{offset: d.delayed + d.cancelled, value: d.cancelled}, {offset: d.delayed, value: d.delayed}, {offset:d.delayed+d.cancelled+5, value: d.ontime+d.delayed+d.cancelled}]; })
 	var legendlabels = bars.selectAll("text.chart-bar-legendlabel")
 		.data(function(d) { return [d]; })
 
@@ -810,7 +826,7 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 	labels
 		.attr("dy", 11)
 		.style("text-anchor", "end")
-		.style("fill", "white")
+		.style("fill", "black")
 		.transition()
 		.text(function(d) { return x(d.value) > 10 && d.value > 0 ? d.value : ""; })
 		.attr("x", function(d) { return x(d.offset) + 28; })
@@ -828,9 +844,14 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 		.style("fill", "black")
 		.attr("class", "chart-bar-legendlabel");
 
+	// map.select("g#pies").selectAll("g").exit().remove();
+
 	var pies = map.select("g#pies").selectAll("g")
 		.data(merged_data,key);
 		// .data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
+
+	pies
+		.exit().remove();
 
 	// console.log("REDRAW:\t pies");
 	// console.log(pies)
@@ -852,55 +873,7 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 				selected_airport = d3.select(this);
 				selectAirport(d3.select(this));
 				drawTracks(d3.select(this), merged_data); // for mobile support
-
-				var titleHtml = "Delayed: " + d.delayed;
-				if (d.cancelled > 0) {
-					titleHtml += "</br>Cancelled: " + d.cancelled;
-				}
-				if (d.ontime > 0) {
-					titleHtml += "</br>OnTime: " + d.ontime;
-				}
-
-				var contentHtml = "";
-
-				for (var i = 0; i < d.airport.length; ++i) {
-					contentHtml += "<a href=\""+hostname+"/live/airport/" + d.airport[i] + "\" target=\"_blank\" style=\"color: #3498db;\">" + d.airport[i] + "</a>";
-
-					if (i < d.airport.length - 1) {
-						contentHtml += "</br>";
-					}
-				}
-
-				var orig = airport_code_from_datum(d);
-				var dests = merged_data.filter(function (data) {
-					for (var j = 0; j < d.destinations.length; ++j) {
-						if (d.destinations[j].airport == airport_code_from_datum(data)) {
-							return true;
-						}
-					}
-
-					return false;
-				});
-
-				if (dests.length > 0) {
-					contentHtml += "<p style=\"font-size: 10px; font-weight: bolder;\">All flights to</br>major destinations:</p>";
-					contentHtml += "<select id=\"flight_finder_options\" onchange=\"flight_finder_option_change('" + orig + "');\">";
-					
-					for (var j = 0; j < dests.length; ++j) {
-						var dest = airport_code_from_datum(dests[j]);
-						contentHtml += "<option value=\"" + dest + "\">";
-						contentHtml += orig + ' &rarr; ' + dest;
-						contentHtml += "</option>";
-					}
-
-					contentHtml += "</select>";
-					contentHtml += "</br><a id=\"flight_finder_link\" href=\""+ hostname +"/live/findflight/\" target=\"_blank\" style=\"color: #3498db\">View Flight Finder for Route</a>"
-				}
-
-				invoke_popup(d3.event,
-							 titleHtml,
-							 contentHtml,
-							 dests.length + d.airport.length);
+				popup_create(d,merged_data);
 
 				// Make sure the link is correctly generated at first.
 				// flight_finder_option_change(orig);
@@ -955,6 +928,8 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 
 	if (selected_airport) {
 		drawTracks(selected_airport, merged_data);
+		popup_create(selected_airport.datum(),merged_data);
+		reset_popup_timer();
 	}
 
 	map.select("#weather")
@@ -1102,7 +1077,7 @@ function drawTimelineMarker(time) {
 d3.select("#timeline-controls").on("click", function(e) {
 	d3.event.preventDefault();
 
-	fade_out_popup();
+	// fade_out_popup();
 
 	var play_button = d3.select(this).select("#timeline-controls-play");
 	var pause_button = d3.select(this).select("#timeline-controls-pause");
@@ -1416,7 +1391,7 @@ function fade_in_popup() {
 	  .transition()
 	  .style('opacity', 100)
 	  .style('display', 'block')
-	  .duration(1000);
+	  .duration(3000);
 }
 
 function invoke_popup(e, titleHtml, contentHtml, numLines) {
@@ -1518,5 +1493,57 @@ function update_url(epoch, airport) {
 	history.replaceState(null, null, url);
 }
 
+function popup_create(d,merged_data){
+	var titleHtml = "Delayed: " + d.delayed;
+	if (d.cancelled > 0) {
+		titleHtml += "</br>Cancelled: " + d.cancelled;
+	}
+	if (d.ontime > 0) {
+		titleHtml += "</br>OnTime: " + d.ontime;
+	}
+
+	var contentHtml = "";
+
+	if (use_merged_data==1){
+		for (var i = 0; i < d.airport.length; ++i) {
+			contentHtml += "<a href=\""+hostname+"/live/airport/" + d.airport[i] + "\" target=\"_blank\" style=\"color: #3498db;\">" + d.airport[i] + "</a>";
+
+			if (i < d.airport.length - 1) {
+				contentHtml += "</br>";
+			}
+		}
+	} else {
+		contentHtml += "<a href=\""+hostname+"/live/airport/" + d.airport + "\" target=\"_blank\" style=\"color: #3498db;\">" + d.airport + "</a>";
+		contentHtml += "</br>";
+	}
+	var orig = airport_code_from_datum(d);
+	var dests = merged_data.filter(function (data) {
+		for (var j = 0; j < d.destinations.length; ++j) {
+			if (d.destinations[j].airport == airport_code_from_datum(data)) {
+				return true;
+			}
+		}
+		return false;
+	});
+
+	if (dests.length > 0) {
+		contentHtml += "<p style=\"font-size: 10px; font-weight: bolder;\">All flights to</br>major destinations:</p>";
+		contentHtml += "<select id=\"flight_finder_options\" onchange=\"flight_finder_option_change('" + orig + "');\">";
+		
+		for (var j = 0; j < dests.length; ++j) {
+			var dest = airport_code_from_datum(dests[j]);
+			contentHtml += "<option value=\"" + dest + "\">";
+			contentHtml += orig + ' &rarr; ' + dest;
+			contentHtml += "</option>";
+		}
+
+		contentHtml += "</select>";
+		contentHtml += "</br><a id=\"flight_finder_link\" href=\""+ hostname +"/live/findflight/\" target=\"_blank\" style=\"color: #3498db\">View Flight Finder for Route</a>"
+	}
+	invoke_popup(d3.event,
+						 titleHtml,
+						 contentHtml,
+						 dests.length + d.airport.length);
+}
 
 

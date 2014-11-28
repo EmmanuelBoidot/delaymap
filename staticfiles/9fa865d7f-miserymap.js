@@ -158,6 +158,7 @@ fileblock.append("line")
 	.attr("class", "chart-axis");
 
 map.on('click', function(d){chart.attr('class','');});
+timeline.on('click', function(d){chart.attr('class','');});
 
 // d3.select("#sidebar-fullcancellink").on("keydown", function(e){
 // 	console.log("coucou cest moi")
@@ -177,9 +178,15 @@ function resize_bar_choose(){
 
 var data_file;
 var loading_in_progress = 0;
-var use_merged_data = 1;
+var use_merged_data = 0;
 var use_saved_data = 0;
 var previous_hist = '';
+
+if ( use_merged_data === 1 ) {
+	d3.select('#merge_choser').selectAll("span").attr('class','slider-button')
+} else {
+	d3.select('#merge_choser').selectAll("span").attr('class','slider-button on')
+}
 
 if ( use_saved_data === 1 ) {
 	data_file = "./data/historical.rvt";
@@ -393,6 +400,7 @@ function load_data(file_str){
 				merged_data = merge_data(historical_data[loaded_time_slice].data);
 			else
 				merged_data = historical_data[loaded_time_slice].data;
+			// console.log(merged_data)
 
 			// Remove previous graphical elements
 			map.selectAll("g#pies > g").remove();
@@ -526,6 +534,7 @@ function load_data(file_str){
 					.datum(closest_slice.time)
 					.text(date_format);
 			}).on("click", function() {
+				chart.attr('class','');
 				hovermarker
 					.style("display", "none");
 
@@ -651,6 +660,8 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 		else
 			merged_data = data;
 	}
+	var airport_sort = function(a,b) { return d3.descending(a.delayed + a.cancelled, b.delayed + b.cancelled); };
+	merged_data = merged_data.sort(airport_sort);
 	// var mymergeddata = []
 	// for(var i = 0; i < merged_data.length; i++){
 	// 	// console.log(merged_data[i].airport)
@@ -711,10 +722,10 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 		.data([starttime_display, stoptime_display, utc_or_not_display])
 		.text(String);
 
-	var airport_sort = function(a,b) { return d3.descending(a.delayed + a.cancelled, b.delayed + b.cancelled); };
+	// var airport_sort = function(a,b) { return d3.descending(a.delayed + a.cancelled, b.delayed + b.cancelled); };
 	// Limit result to top 16
 	// var filtered_data = data.filter(function(d) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort).slice(0, 20);
-	filtered_data = data.filter(function(d,i) { return (d.delayed + d.cancelled) > 0; }).sort(airport_sort);
+	filtered_data = data.filter(function(d,i) { return (d.delayed + d.cancelled) > 0; });//.sort(airport_sort);
 	// console.log(data);
 	// console.log(filtered_data);
 	// console.log(filtered_data[0].airport)
@@ -846,15 +857,15 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 
 	// map.select("g#pies").selectAll("g").exit().remove();
 
+	// console.log(merged_data)
 	var pies = map.select("g#pies").selectAll("g")
 		.data(merged_data,key);
-		// .data(merged_data,function(d,i){if (typeof d !== 'undefined'){return d.airport;}})
-
-	pies
-		.exit().remove();
-
-	// console.log("REDRAW:\t pies");
 	// console.log(pies)
+
+	// pies
+		// .exit().remove();
+		// .enter();
+	// console.log(map.select("g#pies").selectAll("g"))
 
 	pies
 		.on("mouseenter", function(d) {
@@ -901,6 +912,7 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 	// console.log("REDRAW:\t pies");
 	// console.log(pies)
 
+
 	pies.selectAll("path")
 		.data(function(d, i) { return pie([d, d], i); })
 		.style("stroke", "white")
@@ -941,7 +953,7 @@ function redraw(data, time, merged_data,startime_raw,endtime_raw) {
 			d3.select(this).style("display", "none");
 		});
 	
-	if (typeof response_airport !== 'undefined' && loaded_response === false) {
+	if (typeof response_airport !== 'undefined') {
 		// console.log("REDRAW:\t endloop ----")
 		map.selectAll("g#pies > g").filter(function(e) { return e.airport.indexOf(response_airport) !== -1; })
 		   .each(function(d, i) {
@@ -1009,8 +1021,11 @@ function drawTracks(element, data) {
 			var destination = get_departure_from_airport(airport, d);
 			if (typeof destination === 'undefined')
 				return 0;
-			else
+			else {
+				// console.log(destination)
+				// console.log(((destination.ontime || 0) + (destination.delayed || 0) + (destination.cancelled || 0)))
 				return ((destination.ontime || 0) + (destination.delayed || 0) + (destination.cancelled || 0)) / 1.5;
+			}
 		})
 
 	if (animate_tracks) {
@@ -1033,6 +1048,7 @@ function removeTracks() {
 }
 
 function advanceMap() {
+	chart.attr('class','');
 	//current_time = time_chunk_size.offset(current_time, 1);
 	var next_slice = null;
 	var next_slice_time_delta = Infinity;
@@ -1252,7 +1268,7 @@ function get_pie_from_bar(d) {
 function get_weather_url_at_time(time) {
 	var top_left = degrees_to_meters(projection.invert([0,0]));
 	var bottom_right = degrees_to_meters(projection.invert([map_width, map_height]));
-	return "http://e1.flightcdn.com/ajax/weather.rvt?projection=merc&lowlat=" + bottom_right[1] + "&lowlon=" + bottom_right[0] + "&hilat=" + top_left[1] + "&hilon=" + top_left[0] + "&width=" + map_width + "&height=" + map.attr("height") + "&clock=" + Math.floor(time / 1000);
+	return "http://e1.flightcdn.com/ajax/weather.rvt?projection=merc&lowlat=" + bottom_right[1] + "&lowlon=" + bottom_right[0] + "&hilat=" + top_left[1] + "&hilon=" + top_left[0] + "&width=" + map_width + "&height=" + map_height + "&clock=" + Math.floor(time / 1000);
 };
 // Ported from flightaware-track
 function round_weather_time(time) {
@@ -1395,6 +1411,7 @@ function fade_in_popup() {
 }
 
 function invoke_popup(e, titleHtml, contentHtml, numLines) {
+	e = d3.event;
 	var p = d3.select('#pop-up');
 
 	var pl = e.pageX + 50;
@@ -1540,8 +1557,7 @@ function popup_create(d,merged_data){
 		contentHtml += "</select>";
 		contentHtml += "</br><a id=\"flight_finder_link\" href=\""+ hostname +"/live/findflight/\" target=\"_blank\" style=\"color: #3498db\">View Flight Finder for Route</a>"
 	}
-	invoke_popup(d3.event,
-						 titleHtml,
+	invoke_popup(titleHtml,
 						 contentHtml,
 						 dests.length + d.airport.length);
 }
